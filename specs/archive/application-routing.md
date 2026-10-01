@@ -19,8 +19,6 @@ design background for URL hydration.
 - The `w` query parameter stores up to 32 app windows. It contains a version,
   ordered application paths, percent-based frames, minimized/fullscreen state,
   and the frame needed when leaving fullscreen. Entry order is stacking order.
-- Older `workspace=1` and indexed `windows[n]` links remain readable and are
-  replaced with the compact format when the workspace changes.
 - The pathname identifies the active app. A conflicting saved layout yields to
   the pathname; `/` minimizes every visible window.
 - Changing window geometry, order, visibility, fullscreen state, or running apps
@@ -28,7 +26,6 @@ design background for URL hydration.
   unrelated query parameters and the fragment.
 - Direct links and reloads restore registered apps and their saved windows.
   Unknown apps, malformed geometry, and unsupported format versions are ignored.
-  The archived single-window framing example is also accepted.
 - Loading a shared workspace URL in an already running session restores its
   listed windows. Other running apps remain open and keep their content, behind
   the restored windows. Closing an app removes it from the serialized workspace.

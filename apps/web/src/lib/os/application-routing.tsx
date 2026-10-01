@@ -49,7 +49,7 @@ export function ApplicationRoutingProvider({
   children,
 }: React.PropsWithChildren) {
   const router = useRouter();
-  const { location, status, isLoading, matches, statusCode } = useRouterState();
+  const { location, status, isLoading, matches } = useRouterState();
   const { power } = useSystem();
   const { runningApplications, launch, isRunning } = useApplicationManager();
   const {
@@ -67,10 +67,7 @@ export function ApplicationRoutingProvider({
     power === "on" &&
     status === "idle" &&
     !isLoading &&
-    statusCode < 400 &&
-    matches.every(
-      (match) => match.status === "success" && !match.globalNotFound,
-    );
+    matches.every((match) => match.status === "success" && !match._notFound);
 
   // Both directions consume the same navigation. Keep its origin until the
   // next visit, regardless of whether the route or provider effect runs first.
@@ -104,7 +101,7 @@ export function ApplicationRoutingProvider({
       savedAppsLaunched: false,
       workspace: isWindowSync
         ? []
-        : parseWorkspace(location.search, path, isApplicationPath),
+        : parseWorkspace(location.search, isApplicationPath),
     };
     if (!isWindowSync) pendingActivation.current = path === "/" ? null : path;
     return navigation.current;

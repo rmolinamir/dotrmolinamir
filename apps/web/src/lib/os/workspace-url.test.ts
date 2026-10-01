@@ -32,8 +32,7 @@ describe("workspace URL format", () => {
     expect(search.w).toBe("1|about,h,10,12,60,70|doom,f,10,12,60,70");
     expect(defaultStringifySearch(search).length).toBeLessThan(150);
     const decoded = defaultParseSearch(defaultStringifySearch(search));
-    const restored = parseWorkspace(decoded, "/doom", known);
-    expect(restored).toEqual([
+    expect(parseWorkspace(decoded, known)).toEqual([
       {
         framing,
         isFullscreen: false,
@@ -51,60 +50,32 @@ describe("workspace URL format", () => {
         zIndex: 2,
       },
     ]);
-    expect((decoded as Record<string, unknown>).campaign).toBe("hello");
-    expect((decoded as Record<string, unknown>).page).toBe(2);
+    expect(decoded).toMatchObject({ campaign: "hello", page: 2 });
     expect(serializeWorkspace(decoded, [])).toEqual({
       campaign: "hello",
       page: 2,
     });
   });
 
-  it("reads the archived single-window example", () => {
-    const search = defaultParseSearch(
-      "?window[framing][x]=10&window[framing][y]=12&window[framing][width]=60&window[framing][height]=70",
-    );
-    expect(parseWorkspace(search, "/about", known)[0]?.framing).toEqual(
-      framing,
-    );
-    expect(parseWorkspace(search, "/missing", known)).toEqual([]);
-  });
-
-  it("accepts sparse PostHog-style indices and sorts by stacking order", () => {
-    const search = defaultParseSearch(
-      "?windows[3][path]=/about&windows[3][zIndex]=9&windows[1][path]=/doom&windows[1][zIndex]=2",
-    );
-    expect(
-      parseWorkspace(search, "/about", known).map((window) => window.path),
-    ).toEqual(["/doom", "/about"]);
-    expect(
-      serializeWorkspace(
-        search,
-        parseWorkspace(search, "/about", known).map(({ path, ...window }) => ({
-          ...window,
-          id: path,
-        })),
-      ),
-    ).toEqual({ w: "1|doom|about" });
-  });
-
-  it("reads compact routes with reserved characters and skips malformed entries", () => {
+  it("reads encoded routes and skips malformed, duplicate, and unknown entries", () => {
     const search = serializeWorkspace({}, [
       { id: "/a,b|c", zIndex: 1 },
       { id: "/about", zIndex: 2 },
     ]);
     const decoded = defaultParseSearch(defaultStringifySearch(search));
     expect(
-      parseWorkspace(decoded, "/about", (path) =>
+      parseWorkspace(decoded, (path) =>
         ["/a,b|c", "/about"].includes(path),
       ).map((window) => window.path),
     ).toEqual(["/a,b|c", "/about"]);
-    expect(parseWorkspace({ w: "2|about" }, "/about", known)).toEqual([]);
-    expect(parseWorkspace({ w: "1|%ZZ|about" }, "/about", known)).toMatchObject(
-      [{ path: "/about" }],
-    );
+    expect(
+      parseWorkspace({ w: "1|%ZZ|missing|about|about|doom" }, known).map(
+        (window) => window.path,
+      ),
+    ).toEqual(["/about", "/doom"]);
   });
 
-  it("restores a minimized fullscreen window from the compact format", () => {
+  it("restores a minimized fullscreen window", () => {
     const search = serializeWorkspace({}, [
       {
         framing: {
@@ -120,80 +91,51 @@ describe("workspace URL format", () => {
       },
     ]);
     expect(search.w).toBe("1|about,hf,10,12,60,70");
-    expect(parseWorkspace(search, "/", known)[0]).toMatchObject({
+    expect(parseWorkspace(search, known)[0]).toMatchObject({
       isFullscreen: true,
       isHidden: true,
       previousFraming: framing,
     });
-    expect(
-      parseWorkspace({ w: `1|${"about|".repeat(33)}` }, "/", known),
-    ).toEqual([]);
   });
 
-  it("ignores unknown or duplicate app routes and unsupported versions", () => {
-    const search = {
-      "windows[0][path]": "https://evil.test",
-      "windows[1][path]": "/about",
-      "windows[2][path]": "/about",
-      "windows[3][path]": ["/doom"],
-    };
-    expect(parseWorkspace(search, "/about", known)).toHaveLength(1);
+  it("accepts only compact workspace input and removes obsolete URL fields", () => {
+    expect(parseWorkspace({}, known)).toEqual([]);
+    expect(parseWorkspace({ workspace: 1 }, known)).toEqual([]);
+    expect(parseWorkspace({ w: "2|about" }, known)).toEqual([]);
+    expect(parseWorkspace({ w: `1|${"about|".repeat(33)}` }, known)).toEqual(
+      [],
+    );
     expect(
-      parseWorkspace({ ...search, workspace: 2 }, "/about", known),
-    ).toEqual([]);
+      serializeWorkspace(
+        {
+          campaign: "hello",
+          "window[framing][x]": 10,
+          "windows[0][path]": "/about",
+          workspace: 1,
+        },
+        [],
+      ),
+    ).toEqual({ campaign: "hello" });
   });
 
   it.each([
-    Number.NaN,
-    Number.POSITIVE_INFINITY,
     "NaN",
     "Infinity",
     "",
-    null,
-    true,
-    [],
-    {},
-  ])("discards malformed geometry (%j) without discarding a valid app", (invalid) => {
-    const search = {
-      "windows[0][path]": "/about",
-      "windows[0][position][x]": invalid,
-      "windows[0][position][y]": 0,
-      "windows[0][size][height]": 70,
-      "windows[0][size][width]": 60,
-    };
-    const result = parseWorkspace(search, "/about", known);
+    "invalid",
+  ])("discards malformed geometry (%s) without discarding a valid app", (invalid) => {
+    const result = parseWorkspace({ w: `1|about,${invalid},0,60,70` }, known);
     expect(result).toHaveLength(1);
     expect(result[0]?.framing).toBeUndefined();
   });
 
   it("clamps geometry to the workspace and rounds to a stable precision", () => {
-    const search = {
-      "windows[0][path]": "/about",
-      "windows[0][position][x]": -50,
-      "windows[0][position][y]": 99,
-      "windows[0][size][height]": 33.123456,
-      "windows[0][size][width]": 200,
-    };
-    expect(parseWorkspace(search, "/about", known)[0]?.framing).toEqual({
+    expect(
+      parseWorkspace({ w: "1|about,-50,99,200,33.123456" }, known)[0]?.framing,
+    ).toEqual({
       position: { x: 0, y: 66.8765 },
       size: { height: 33.1235, width: 100 },
       unit: "percent",
     });
-  });
-
-  it("bounds the number of entries and ignores malformed flags", () => {
-    const search = {
-      "windows[0][isFullscreen]": {},
-      "windows[0][isHidden]": "false",
-      "windows[0][path]": "/about",
-      "windows[99][path]": "/doom",
-    };
-    expect(parseWorkspace(search, "/about", known)).toMatchObject([
-      { isFullscreen: false, isHidden: false, path: "/about" },
-    ]);
-    const excessive = Object.fromEntries(
-      Array.from({ length: 600 }, (_, i) => [`windows[${i}][path]`, "/about"]),
-    );
-    expect(parseWorkspace(excessive, "/about", known)).toEqual([]);
   });
 });

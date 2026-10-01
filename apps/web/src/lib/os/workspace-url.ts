@@ -5,7 +5,6 @@ export type WorkspaceWindow = Omit<WindowInstance, "id"> & { path: string };
 export type WorkspaceSearch = Record<string, unknown>;
 
 const MAX_WINDOWS = 32;
-const MAX_WORKSPACE_KEYS = MAX_WINDOWS * 16;
 const MAX_COMPACT_LENGTH = 4096;
 const COMPACT_VERSION = "1";
 const fullFrame: WindowPercentFraming = {
@@ -67,23 +66,12 @@ function frame(
   };
 }
 
-function readFrame(search: WorkspaceSearch, prefix: string) {
-  return frame(
-    search[`${prefix}[position][x]`],
-    search[`${prefix}[position][y]`],
-    search[`${prefix}[size][width]`],
-    search[`${prefix}[size][height]`],
-  );
-}
-
-function flag(value: unknown) {
-  return value === true || value === "true" || value === 1 || value === "1";
-}
-
-function parseCompactWorkspace(
-  value: unknown,
+/** Only registered local application routes can be restored from URL input. */
+export function parseWorkspace(
+  search: WorkspaceSearch,
   isApplicationPath: (path: string) => boolean,
 ): WorkspaceWindow[] {
+  const value = search.w;
   if (typeof value !== "string" || value.length > MAX_COMPACT_LENGTH) return [];
   const [version, ...entries] = value.split("|");
   if (version !== COMPACT_VERSION || entries.length > MAX_WINDOWS) return [];
@@ -120,77 +108,6 @@ function parseCompactWorkspace(
     windows.push(window);
   }
   return windows;
-}
-
-/** Only registered local application routes can be restored from URL input. */
-export function parseWorkspace(
-  search: WorkspaceSearch,
-  pathname: string,
-  isApplicationPath: (path: string) => boolean,
-): WorkspaceWindow[] {
-  if (search.w !== undefined)
-    return parseCompactWorkspace(search.w, isApplicationPath);
-  return parseLegacyWorkspace(search, pathname, isApplicationPath);
-}
-
-function parseLegacyWorkspace(
-  search: WorkspaceSearch,
-  pathname: string,
-  isApplicationPath: (path: string) => boolean,
-): WorkspaceWindow[] {
-  if (search.workspace !== undefined && number(search.workspace) !== 1)
-    return [];
-  const keys = Object.keys(search).filter(isWorkspaceKey);
-  if (keys.length > MAX_WORKSPACE_KEYS) return [];
-  const indices = new Set<number>();
-  for (const key of keys) {
-    const match = /^windows\[(\d{1,2})\]\[path\]$/.exec(key);
-    if (match && Number(match[1]) < MAX_WINDOWS) indices.add(Number(match[1]));
-  }
-  const paths = new Set<string>();
-  const windows: WorkspaceWindow[] = [];
-  for (const index of [...indices].sort((a, b) => a - b)) {
-    const prefix = `windows[${index}]`;
-    const path = search[`${prefix}[path]`];
-    if (typeof path !== "string" || !isApplicationPath(path) || paths.has(path))
-      continue;
-    paths.add(path);
-    const framing = readFrame(search, prefix);
-    const previousFraming = readFrame(search, `${prefix}[previousFraming]`);
-    const isFullscreen = flag(search[`${prefix}[isFullscreen]`]);
-    const entry: WorkspaceWindow = {
-      isFullscreen,
-      isHidden: flag(search[`${prefix}[isHidden]`]),
-      path,
-      previousFraming: isFullscreen
-        ? (previousFraming ?? framing ?? null)
-        : null,
-      zIndex: number(search[`${prefix}[zIndex]`]) ?? index + 1,
-    };
-    if (framing || isFullscreen)
-      entry.framing = isFullscreen ? fullFrame : framing;
-    windows.push(entry);
-  }
-
-  // Accept the single-window example from the original design as well.
-  if (!windows.length && isApplicationPath(pathname)) {
-    const framing = frame(
-      search["window[framing][x]"],
-      search["window[framing][y]"],
-      search["window[framing][width]"],
-      search["window[framing][height]"],
-    );
-    if (framing)
-      windows.push({
-        framing,
-        isFullscreen: false,
-        isHidden: false,
-        path: pathname,
-        previousFraming: null,
-        zIndex: 1,
-      });
-  }
-  return [...windows].sort((a, b) => a.zIndex - b.zIndex);
 }
 
 function compactFrame(value: WindowPercentFraming | undefined): number[] {

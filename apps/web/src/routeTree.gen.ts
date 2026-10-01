@@ -10,18 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as applicationsResumeIndexRouteImport } from './routes/(applications)/resume/index'
-import { Route as applicationsDoomIndexRouteImport } from './routes/(applications)/doom/index'
 import { Route as applicationsAboutIndexRouteImport } from './routes/(applications)/about/index'
+import { Route as applicationsDoomIndexRouteImport } from './routes/(applications)/doom/index'
+import { Route as applicationsResumeIndexRouteImport } from './routes/(applications)/resume/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const applicationsResumeIndexRoute = applicationsResumeIndexRouteImport.update({
-  id: '/(applications)/resume/',
-  path: '/resume/',
+const applicationsAboutIndexRoute = applicationsAboutIndexRouteImport.update({
+  id: '/(applications)/about/',
+  path: '/about/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const applicationsDoomIndexRoute = applicationsDoomIndexRouteImport.update({
@@ -29,9 +29,9 @@ const applicationsDoomIndexRoute = applicationsDoomIndexRouteImport.update({
   path: '/doom/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const applicationsAboutIndexRoute = applicationsAboutIndexRouteImport.update({
-  id: '/(applications)/about/',
-  path: '/about/',
+const applicationsResumeIndexRoute = applicationsResumeIndexRouteImport.update({
+  id: '/(applications)/resume/',
+  path: '/resume/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -83,11 +83,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(applications)/resume/': {
-      id: '/(applications)/resume/'
-      path: '/resume'
-      fullPath: '/resume/'
-      preLoaderRoute: typeof applicationsResumeIndexRouteImport
+    '/(applications)/about/': {
+      id: '/(applications)/about/'
+      path: '/about'
+      fullPath: '/about/'
+      preLoaderRoute: typeof applicationsAboutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(applications)/doom/': {
@@ -97,11 +97,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof applicationsDoomIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(applications)/about/': {
-      id: '/(applications)/about/'
-      path: '/about'
-      fullPath: '/about/'
-      preLoaderRoute: typeof applicationsAboutIndexRouteImport
+    '/(applications)/resume/': {
+      id: '/(applications)/resume/'
+      path: '/resume'
+      fullPath: '/resume/'
+      preLoaderRoute: typeof applicationsResumeIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
