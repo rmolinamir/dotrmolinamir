@@ -35,10 +35,10 @@ type Navigation = {
   key: string;
   path: string;
   isWindowSync: boolean;
-  launched: boolean;
+  routeLaunched: boolean;
   workspace: WorkspaceWindow[];
-  workspaceLaunched: boolean;
-  workspaceApplied: boolean;
+  savedAppsLaunched: boolean;
+  layoutRestored: boolean;
 };
 
 const ApplicationRoutingContext = React.createContext<
@@ -89,25 +89,24 @@ export function ApplicationRoutingProvider({
     if (!ready) return;
     const path = location.pathname.replace(/\/$/, "") || "/";
     if (path !== "/" && !isApplicationPath(path)) return;
+    if (navigation.current) return navigation.current;
 
-    if (navigation.current?.key !== key) {
-      const isWindowSync =
-        pendingSync.current !== undefined &&
-        location.state.applicationWindowSync === pendingSync.current;
-      pendingSync.current = undefined;
-      navigation.current = {
-        isWindowSync,
-        key,
-        launched: false,
-        path,
-        workspace: isWindowSync
-          ? []
-          : parseWorkspace(location.search, path, isApplicationPath),
-        workspaceApplied: false,
-        workspaceLaunched: false,
-      };
-      if (!isWindowSync) pendingActivation.current = path === "/" ? null : path;
-    }
+    const isWindowSync =
+      pendingSync.current !== undefined &&
+      location.state.applicationWindowSync === pendingSync.current;
+    pendingSync.current = undefined;
+    navigation.current = {
+      isWindowSync,
+      key,
+      layoutRestored: false,
+      path,
+      routeLaunched: false,
+      savedAppsLaunched: false,
+      workspace: isWindowSync
+        ? []
+        : parseWorkspace(location.search, path, isApplicationPath),
+    };
+    if (!isWindowSync) pendingActivation.current = path === "/" ? null : path;
     return navigation.current;
   }, [ready, location]);
 
@@ -118,10 +117,10 @@ export function ApplicationRoutingProvider({
         !current ||
         current.path !== path ||
         current.isWindowSync ||
-        current.launched
+        current.routeLaunched
       )
         return false;
-      current.launched = true;
+      current.routeLaunched = true;
       return true;
     },
     [getNavigation],
@@ -131,56 +130,70 @@ export function ApplicationRoutingProvider({
     const current = getNavigation();
     if (!current) return;
 
-    // Active-route launches still belong to Route -> launchWindow. Other apps
-    // named in the snapshot resolve through the same application definitions.
-    if (!current.workspaceLaunched) {
-      current.workspaceLaunched = true;
-      let launching = false;
-      for (const entry of current.workspace) {
-        if (entry.path === current.path) continue;
+    function launchSavedApplications(navigation: Navigation): boolean {
+      if (navigation.savedAppsLaunched) return false;
+      navigation.savedAppsLaunched = true;
+      // The active route launches through Route -> launchWindow.
+      // Only the other saved apps need launching here.
+      let launched = false;
+      for (const entry of navigation.workspace) {
+        if (entry.path === navigation.path) continue;
         const application = getApplication(entry.path);
-        if (application && !isRunning(application)) {
-          launch(application);
-          launching = true;
-        }
+        if (!application || isRunning(application)) continue;
+        launch(application);
+        launched = true;
       }
-      if (launching) return;
+      return launched;
     }
 
-    // Window registration/cleanup follows the application commit. Do not
-    // synchronize an intermediate frame back into a route-driven launch.
-    if (
-      runningApplications.some((app) => !getWindowData(app.id)) ||
-      windows.some(
-        (window) => !runningApplications.some((app) => app.id === window.id),
-      )
-    )
-      return;
-
-    if (current.workspace.length && !current.workspaceApplied) {
-      if (current.workspace.some((entry) => !getWindowData(entry.path))) return;
-      current.workspaceApplied = true;
-      restoreWindowLayout(
-        current.workspace.map(({ path, ...entry }) => ({ ...entry, id: path })),
+    function hasUncommittedWindows(): boolean {
+      // Registration and cleanup follow the application commit. Wait for both
+      // sides before applying a layout or writing an intermediate URL.
+      return (
+        runningApplications.some((app) => !getWindowData(app.id)) ||
+        windows.some(
+          (window) => !runningApplications.some((app) => app.id === window.id),
+        )
       );
-      return;
     }
 
-    // The route's launchWindow call may not have committed yet. Also restore
-    // its requested focus when the desktop remounts after a not-found screen.
-    if (pendingActivation.current !== undefined) {
-      if ((focusedId ?? null) !== pendingActivation.current) {
-        if (pendingActivation.current === null) {
-          for (const window of windows) {
-            if (!getWindowData(window.id)?.isHidden) hideWindow(window.id);
-          }
-        } else if (getWindowData(pendingActivation.current)) {
-          activateWindow(pendingActivation.current);
-        }
-        return;
-      }
-      pendingActivation.current = undefined;
+    function restoreSavedLayout(navigation: Navigation): boolean {
+      if (navigation.layoutRestored || !navigation.workspace.length)
+        return false;
+      if (navigation.workspace.some((entry) => !getWindowData(entry.path)))
+        return true;
+      restoreWindowLayout(
+        navigation.workspace.map(({ path, ...entry }) => ({
+          ...entry,
+          id: path,
+        })),
+      );
+      navigation.layoutRestored = true;
+      return true;
     }
+
+    function activateRequestedWindow(): boolean {
+      const requested = pendingActivation.current;
+      if (requested === undefined) return false;
+      if ((focusedId ?? null) === requested) {
+        pendingActivation.current = undefined;
+        return false;
+      }
+      if (requested === null) {
+        for (const window of windows) {
+          if (!getWindowData(window.id)?.isHidden) hideWindow(window.id);
+        }
+        return true;
+      }
+      if (getWindowData(requested)) activateWindow(requested);
+      return true;
+    }
+
+    // Each phase stops here when it starts work or needs another commit.
+    if (launchSavedApplications(current)) return;
+    if (hasUncommittedWindows()) return;
+    if (restoreSavedLayout(current)) return;
+    if (activateRequestedWindow()) return;
 
     const focusedWindow = focusedId ? getWindowData(focusedId) : undefined;
     const to =
