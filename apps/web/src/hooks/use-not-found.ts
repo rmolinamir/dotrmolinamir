@@ -1,10 +1,11 @@
-import { useRouter, useRouterState } from "@tanstack/react-router";
+import { useRouterState } from "@tanstack/react-router";
 
 export function useNotFound() {
-  const { hasNotFoundMatch } = useRouter();
-  const { statusCode } = useRouterState();
+  const matches = useRouterState({ select: (state) => state.matches });
 
   return {
-    isNotFound: hasNotFoundMatch() || statusCode === 404,
+    isNotFound: matches.some(
+      (match) => match.status === "notFound" || match._notFound,
+    ),
   };
 }

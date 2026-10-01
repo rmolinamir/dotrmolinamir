@@ -10,24 +10,19 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TaskQueueIndexRouteImport } from './routes/task-queue/index'
-import { Route as SelectComponentIndexRouteImport } from './routes/select-component/index'
-import { Route as CommunityPostsIndexRouteImport } from './routes/community-posts/index'
 import { Route as BitcoinFormIndexRouteImport } from './routes/bitcoin-form/index'
+import { Route as CommunityPostsIndexRouteImport } from './routes/community-posts/index'
+import { Route as SelectComponentIndexRouteImport } from './routes/select-component/index'
+import { Route as TaskQueueIndexRouteImport } from './routes/task-queue/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TaskQueueIndexRoute = TaskQueueIndexRouteImport.update({
-  id: '/task-queue/',
-  path: '/task-queue/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SelectComponentIndexRoute = SelectComponentIndexRouteImport.update({
-  id: '/select-component/',
-  path: '/select-component/',
+const BitcoinFormIndexRoute = BitcoinFormIndexRouteImport.update({
+  id: '/bitcoin-form/',
+  path: '/bitcoin-form/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityPostsIndexRoute = CommunityPostsIndexRouteImport.update({
@@ -35,9 +30,14 @@ const CommunityPostsIndexRoute = CommunityPostsIndexRouteImport.update({
   path: '/community-posts/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BitcoinFormIndexRoute = BitcoinFormIndexRouteImport.update({
-  id: '/bitcoin-form/',
-  path: '/bitcoin-form/',
+const SelectComponentIndexRoute = SelectComponentIndexRouteImport.update({
+  id: '/select-component/',
+  path: '/select-component/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TaskQueueIndexRoute = TaskQueueIndexRouteImport.update({
+  id: '/task-queue/',
+  path: '/task-queue/',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -104,18 +104,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/task-queue/': {
-      id: '/task-queue/'
-      path: '/task-queue'
-      fullPath: '/task-queue/'
-      preLoaderRoute: typeof TaskQueueIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/select-component/': {
-      id: '/select-component/'
-      path: '/select-component'
-      fullPath: '/select-component/'
-      preLoaderRoute: typeof SelectComponentIndexRouteImport
+    '/bitcoin-form/': {
+      id: '/bitcoin-form/'
+      path: '/bitcoin-form'
+      fullPath: '/bitcoin-form/'
+      preLoaderRoute: typeof BitcoinFormIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/community-posts/': {
@@ -125,11 +118,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CommunityPostsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/bitcoin-form/': {
-      id: '/bitcoin-form/'
-      path: '/bitcoin-form'
-      fullPath: '/bitcoin-form/'
-      preLoaderRoute: typeof BitcoinFormIndexRouteImport
+    '/select-component/': {
+      id: '/select-component/'
+      path: '/select-component'
+      fullPath: '/select-component/'
+      preLoaderRoute: typeof SelectComponentIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/task-queue/': {
+      id: '/task-queue/'
+      path: '/task-queue'
+      fullPath: '/task-queue/'
+      preLoaderRoute: typeof TaskQueueIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
