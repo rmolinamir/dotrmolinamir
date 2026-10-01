@@ -1,26 +1,14 @@
 # Roadmap
 
-## MVP (Complete)
-
-- Desktop shell, taskbar, windowing, and wallpaper. (complete)
-- Start menu with power button. (complete)
-- BSOD 404 screen. (complete)
-- Power shutdown flow. (complete)
-- App shells: About, Doom, Resume. (complete)
-
-## Completed improvements
-
-- Active-window routing and workspace URL persistence: URL follows the active window, restores window layouts after reload, and uses `/` when no windows are visible. (complete; [routing contract](application-routing.md), [#69](https://github.com/rmolinamir/dotrmolinamir/issues/69))
-
 ## Next
 
-- Blog app (primary content surface).
-- Settings app with display options (theme, wallpaper, taskbar/dock).
-- Terminal app.
+- Blog app (primary content surface). ([#70](https://github.com/rmolinamir/dotrmolinamir/issues/70))
+- Settings app with display options (theme, wallpaper, taskbar/dock). ([#71](https://github.com/rmolinamir/dotrmolinamir/issues/71))
+- Terminal app. ([#72](https://github.com/rmolinamir/dotrmolinamir/issues/72))
 
 ## Later / TBD
 
-- Gallery.
-- Notes.
-- Changelog.
-- Contact.
+- Gallery. ([#73](https://github.com/rmolinamir/dotrmolinamir/issues/73))
+- Notes. ([#74](https://github.com/rmolinamir/dotrmolinamir/issues/74))
+- Changelog. ([#75](https://github.com/rmolinamir/dotrmolinamir/issues/75))
+- Contact. ([#76](https://github.com/rmolinamir/dotrmolinamir/issues/76))

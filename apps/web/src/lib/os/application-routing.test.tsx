@@ -246,14 +246,13 @@ describe("active-window routing", () => {
     act(() => app.managers.windows.setFraming("/about", frame));
     await waitFor(() =>
       expect(
-        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
-          ?.framing,
+        parseWorkspace(app.router.state.location.search, isApp)[0]?.framing,
       ).toEqual(frame),
     );
     act(() => app.managers.windows.toggleFullscreen("/about"));
     await waitFor(() =>
       expect(
-        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
+        parseWorkspace(app.router.state.location.search, isApp)[0]
           ?.isFullscreen,
       ).toBe(true),
     );
@@ -295,8 +294,7 @@ describe("active-window routing", () => {
     act(() => app.managers.windows.setFraming("/about", frame));
     await waitFor(() =>
       expect(
-        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
-          ?.framing,
+        parseWorkspace(app.router.state.location.search, isApp)[0]?.framing,
       ).toEqual(frame),
     );
     await app.navigate("/doom");
@@ -332,9 +330,7 @@ describe("active-window routing", () => {
 
   it("ignores unknown apps and invalid geometry without blocking route launch", async () => {
     const app = setup({
-      initialEntries: [
-        "/about?windows[0][path]=/missing&windows[1][path]=/doom&windows[1][size][width]=NaN",
-      ],
+      initialEntries: ["/about?w=1%7Cmissing%7Cdoom%2CNaN%2C0%2C60%2C70"],
     });
     await app.expectPath("/about");
     await waitFor(() =>
@@ -586,9 +582,7 @@ describe("active-window routing", () => {
     fireEvent.keyDown(document.body, { key: "W", shiftKey: true });
     await app.expectPath("/");
     expect(app.managers.applications.runningApplications).toHaveLength(0);
-    expect(
-      parseWorkspace(app.router.state.location.search, "/", isApp),
-    ).toEqual([]);
+    expect(parseWorkspace(app.router.state.location.search, isApp)).toEqual([]);
   });
 
   it("uses / when all windows are hidden and does not restore them during synchronization", async () => {

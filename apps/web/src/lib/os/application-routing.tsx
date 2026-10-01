@@ -101,7 +101,7 @@ export function ApplicationRoutingProvider({
       savedAppsLaunched: false,
       workspace: isWindowSync
         ? []
-        : parseWorkspace(location.search, path, isApplicationPath),
+        : parseWorkspace(location.search, isApplicationPath),
     };
     if (!isWindowSync) pendingActivation.current = path === "/" ? null : path;
     return navigation.current;

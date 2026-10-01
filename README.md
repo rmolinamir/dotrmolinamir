@@ -29,7 +29,7 @@ This is a monorepo powered by [Turborepo](https://turborepo.dev/) and [pnpm](htt
 
 - **Web Application:** Found in [`apps/web`](./apps/web). Powered by TanStack Start, built by Vite and Nitro.
 - **Packages**: Found in [`packages`](./packages). Includes UI components, OS-themed windowing system, and other shared utilities.
-- **Specs:** Found in [`specs`](./specs). Includes product specifications, roadmaps, and other documentation.
+- **Specs:** Found in [`specs`](./specs). The roadmap tracks upcoming work; completed feature specs live in [`specs/archive`](./specs/archive).
 
 ---
 
@@ -51,7 +51,7 @@ This is a monorepo powered by [Turborepo](https://turborepo.dev/) and [pnpm](htt
 
 ### Stories
 
-- [`apps/web/src/stories`](./apps/web/src/stories): These are the stories of the website's components. This is a playground to experiment with the components and it's mostly used by agents to test while developing via Playwright, but it's also used to sanity check a11y, etc.
+- [`apps/storybook/src`](./apps/storybook/src): Interactive stories for the site's UI and windowing components. Stories with `play` cover visual interactions in a browser.
 
 ---
 

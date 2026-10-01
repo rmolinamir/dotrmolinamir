@@ -6,12 +6,13 @@ Purpose
 - Use specs as the source of truth for product intent.
 
 What lives here
-- Primary product spec: `specs/personal-website.md`.
-- Roadmap: `specs/roadmap.md`.
-- Any future specs should follow the same structure and tone.
+- `specs/roadmap.md` lists only upcoming work.
+- Active specs describe unfinished features. `specs/archive/` holds completed
+  and historical specs, including the original personal website spec.
 
 How to use specs
-- Read the primary spec before making product or UX changes.
+- Read relevant active specs and the roadmap before product or UX changes.
+- Use archived specs for background, then verify shipped behavior in code.
 - Treat the roadmap as the backlog and priority signal.
 - Prefer updating specs in the same PR as behavior changes.
 
@@ -27,8 +28,8 @@ Writing guidelines
 - Avoid date-based or environment-specific statements.
 
 Completion and archive
-- When a spec is complete, note completion in `specs/roadmap.md`.
-- If a spec is retired, move it to `specs/archive/` and leave a short pointer.
+- When a feature ships, remove it from the roadmap and move its spec to
+  `specs/archive/`.
 
 Notes
 - Specs are for humans first; keep them readable and concise.

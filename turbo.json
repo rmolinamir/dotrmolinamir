@@ -37,6 +37,11 @@
       "cache": false,
       "persistent": true
     },
+    "test": {
+      "dependsOn": ["^topo"],
+      "env": ["STORYBOOK_CHROMIUM_EXECUTABLE"],
+      "outputs": []
+    },
     "topo": {
       "dependsOn": ["^topo"]
     },
