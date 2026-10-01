@@ -17,7 +17,6 @@ import { cn } from "@acme/ui/lib/utils";
 import type { ApplicationInstance } from "@acme/ui/os/application";
 import { useApplicationManager } from "@acme/ui/os/application-manager";
 import { useWindowManager } from "@acme/ui/os/window-manager";
-import { Link } from "@tanstack/react-router";
 import { XIcon } from "lucide-react";
 import { useQuitApplications } from "@/hooks/use-quit-applications";
 
@@ -60,18 +59,16 @@ function ApplicationSidebar({
       <SidebarHeader>
         <div className="flex items-center justify-between">
           <div className="font-semibold text-base">Applications</div>
-          <Link to="/">
-            <button
-              type="button"
-              className="text-muted-foreground text-sm hover:text-foreground"
-              onClick={() => {
-                quitApplications();
-                toggleSidebar();
-              }}
-            >
-              Close all
-            </button>
-          </Link>
+          <button
+            type="button"
+            className="text-muted-foreground text-sm hover:text-foreground"
+            onClick={() => {
+              quitApplications();
+              toggleSidebar();
+            }}
+          >
+            Close all
+          </button>
         </div>
       </SidebarHeader>
       <SidebarSeparator />

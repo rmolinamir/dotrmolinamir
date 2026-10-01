@@ -8,6 +8,10 @@
 - Power shutdown flow. (complete)
 - App shells: About, Doom, Resume. (complete)
 
+## Completed improvements
+
+- Active-window routing: URL follows the active window; `/` when no windows are open or all are minimized. (complete; [routing contract](application-routing.md), [#69](https://github.com/rmolinamir/dotrmolinamir/issues/69))
+
 ## Next
 
 - Blog app (primary content surface).

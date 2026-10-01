@@ -45,7 +45,7 @@ export function Desktop({ className, children, ...props }: DesktopProps) {
         </WindowSnap>
       </WindowBoundary>
 
-      {/* Nested Routes are rendered here. For now, these will only be programmatic launchers, no HTML will be rendered. */}
+      {/* Route content shares the desktop; application windows persist across navigation. */}
       {children}
 
       <DesktopGrid className="absolute max-h-full min-h-0 flex-1 p-2">

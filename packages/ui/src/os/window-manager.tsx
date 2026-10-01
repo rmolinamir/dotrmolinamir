@@ -97,7 +97,7 @@ function WindowManagerProvider({ children }: WindowManagerProps) {
 
       const entry: WindowInstance = {
         id,
-        zIndex: prev.windows.length + 1,
+        zIndex: Math.max(0, ...prev.windows.map((window) => window.zIndex)) + 1,
       };
 
       return {

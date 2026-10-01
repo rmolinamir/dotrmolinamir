@@ -23,8 +23,9 @@ function ApplicationManagerProvider({ children }: ApplicationManagerProps) {
 
   const close = React.useCallback((application: ApplicationInstance) => {
     setApplications((prev) => {
-      prev.delete(application.id);
-      return new Map(prev);
+      const next = new Map(prev);
+      next.delete(application.id);
+      return next;
     });
   }, []);
 
