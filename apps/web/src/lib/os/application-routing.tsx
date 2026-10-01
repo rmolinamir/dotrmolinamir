@@ -57,11 +57,21 @@ export function ApplicationRoutingProvider({
   // Both directions consume the same navigation. Keep its origin until the
   // next visit, regardless of whether the route or provider effect runs first.
   const getNavigation = React.useCallback(() => {
+    const key = `${location.state.__TSR_key}:${location.href}`;
+    // Observe departures even while synchronization is suspended. Back from an
+    // error page must consume the restored history entry as a fresh visit.
+    if (navigation.current?.key !== key) {
+      navigation.current = undefined;
+      pendingActivation.current = undefined;
+      if (location.state.applicationWindowSync !== pendingSync.current) {
+        pendingSync.current = undefined;
+      }
+    }
+
     if (!ready) return;
     const path = location.pathname.replace(/\/$/, "") || "/";
     if (path !== "/" && !isApplicationPath(path)) return;
 
-    const key = `${location.state.__TSR_key}:${location.href}`;
     if (navigation.current?.key !== key) {
       const isWindowSync =
         pendingSync.current !== undefined &&

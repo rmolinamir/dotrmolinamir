@@ -32,6 +32,12 @@ Implemented for the desktop applications. This is the current routing contract;
   windows. Applications retain their content until closed and can be restored.
 - Reloading restores only the application named by the URL; the workspace and
   unsaved content are not serialized into history.
+- Full workspace persistence remains a future extension. The archived
+  [PostHog-style URL examples](archive/application-management.md#posthog-url-examples)
+  encode window routes, positions, sizes, and stacking order in query parameters;
+  the [hydration design](archive/application-routing-integration.md#url-hydration-flow-posthog-style)
+  describes restoring those windows and focus on reload. This is not implemented
+  by active-window route synchronization.
 
 ## Loading and system screens
 

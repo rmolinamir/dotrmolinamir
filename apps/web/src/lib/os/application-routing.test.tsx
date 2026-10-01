@@ -178,6 +178,37 @@ function windowFor(title: string) {
 }
 
 describe("active-window routing", () => {
+  it.each([
+    "navigation",
+    "window focus",
+  ])("reactivates the history destination after BSOD when reached through %s", async (source) => {
+    const app = setup({ initialEntries: ["/about"] });
+    await app.expectPath("/about");
+    await app.navigate("/doom");
+    await app.expectPath("/doom");
+    if (source === "navigation") await app.navigate("/about");
+    else act(() => app.managers.windows.activateWindow("/about"));
+    await app.expectPath("/about");
+    const destinationKey = app.router.state.location.state.__TSR_key;
+    await act(async () => {
+      await app.router.navigate({ href: "/missing" });
+    });
+    await screen.findByText("BSOD");
+    expect(app.managers.windows.windows).toHaveLength(0);
+    const historyLength = app.history.length;
+
+    act(() => app.history.back());
+    await app.expectPath("/about");
+    expect(app.router.state.location.state.__TSR_key).toBe(destinationKey);
+    expect(app.history.length).toBe(historyLength);
+    expect(app.managers.applications.runningApplications).toHaveLength(2);
+
+    act(() => app.history.forward());
+    await screen.findByText("BSOD");
+    act(() => app.history.back());
+    await app.expectPath("/about");
+  });
+
   it("allows manager launches from an empty desktop and restores after an already-empty home visit", async () => {
     const app = setup();
     await app.expectPath("/");
