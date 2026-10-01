@@ -44,6 +44,20 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        uses: ./tooling/github/setup
+
+      - name: Install Chromium for Storybook stories
+        run: pnpm --filter @acme/storybook exec playwright install --with-deps chromium
+
+      - name: Test
+        run: pnpm test
+
   build:
     runs-on: ubuntu-latest
     steps:

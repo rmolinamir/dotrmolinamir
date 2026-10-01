@@ -2,8 +2,8 @@
 
 ## Status
 
-Implemented for registered desktop applications. `archive/application-routing-integration.md`
-is the design background for URL hydration.
+Implemented and archived. `application-routing-integration.md` is the original
+design background for URL hydration.
 
 ## Active window and URL
 
@@ -16,10 +16,11 @@ is the design background for URL hydration.
 
 ## Workspace serialization
 
-- The query string stores up to 32 running app windows as indexed `windows[n]`
-  entries. Each entry carries its application path, percent-based position and
-  size, stacking order, minimized state, fullscreen state, and the prior frame
-  needed when leaving fullscreen. `workspace=1` identifies this format.
+- The `w` query parameter stores up to 32 app windows. It contains a version,
+  ordered application paths, percent-based frames, minimized/fullscreen state,
+  and the frame needed when leaving fullscreen. Entry order is stacking order.
+- Older `workspace=1` and indexed `windows[n]` links remain readable and are
+  replaced with the compact format when the workspace changes.
 - The pathname identifies the active app. A conflicting saved layout yields to
   the pathname; `/` minimizes every visible window.
 - Changing window geometry, order, visibility, fullscreen state, or running apps
@@ -33,9 +34,8 @@ is the design background for URL hydration.
   the restored windows. Closing an app removes it from the serialized workspace.
 - Window state is shareable; app content and unsaved edits are not serialized.
 
-For example, `/about?workspace=1&windows[0][path]=/about&windows[0][position][x]=10&windows[0][position][y]=12&windows[0][size][width]=60&windows[0][size][height]=70&windows[0][zIndex]=1`
-restores the About window at that frame. A URL containing multiple `windows[n]`
-entries restores their order and visibility as well.
+For example, `/about?w=1%7Cabout%2C10%2C12%2C60%2C70` restores the About
+window at that frame. More entries restore their order and visibility.
 
 ## Navigation and history
 

@@ -12,6 +12,8 @@ const dirname =
   typeof __dirname !== "undefined"
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
+// biome-ignore lint/style/noProcessEnv: Local ARM test runs can use an existing Chromium binary.
+const chromiumExecutable = process.env.STORYBOOK_CHROMIUM_EXECUTABLE;
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -38,7 +40,11 @@ export default defineConfig({
                 browser: "chromium",
               },
             ],
-            provider: playwright({}),
+            provider: playwright({
+              launchOptions: chromiumExecutable
+                ? { executablePath: chromiumExecutable }
+                : {},
+            }),
           },
           name: "storybook",
           setupFiles: [".storybook/vitest.setup.ts"],

@@ -16,6 +16,7 @@
     "dependencies:check": "pnpm dlx sherif@latest",
     "dependencies:fix": "pnpm dlx sherif@latest -f",
     "dev": "turbo watch dev --continue",
+    "test": "turbo run test",
     "typecheck": "turbo run typecheck"
   },
   "devDependencies": {

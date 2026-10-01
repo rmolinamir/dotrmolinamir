@@ -29,6 +29,8 @@ describe("workspace URL format", () => {
       },
     ];
     const search = serializeWorkspace({ campaign: "hello", page: 2 }, windows);
+    expect(search.w).toBe("1|about,h,10,12,60,70|doom,f,10,12,60,70");
+    expect(defaultStringifySearch(search).length).toBeLessThan(150);
     const decoded = defaultParseSearch(defaultStringifySearch(search));
     const restored = parseWorkspace(decoded, "/doom", known);
     expect(restored).toEqual([
@@ -74,6 +76,58 @@ describe("workspace URL format", () => {
     expect(
       parseWorkspace(search, "/about", known).map((window) => window.path),
     ).toEqual(["/doom", "/about"]);
+    expect(
+      serializeWorkspace(
+        search,
+        parseWorkspace(search, "/about", known).map(({ path, ...window }) => ({
+          ...window,
+          id: path,
+        })),
+      ),
+    ).toEqual({ w: "1|doom|about" });
+  });
+
+  it("reads compact routes with reserved characters and skips malformed entries", () => {
+    const search = serializeWorkspace({}, [
+      { id: "/a,b|c", zIndex: 1 },
+      { id: "/about", zIndex: 2 },
+    ]);
+    const decoded = defaultParseSearch(defaultStringifySearch(search));
+    expect(
+      parseWorkspace(decoded, "/about", (path) =>
+        ["/a,b|c", "/about"].includes(path),
+      ).map((window) => window.path),
+    ).toEqual(["/a,b|c", "/about"]);
+    expect(parseWorkspace({ w: "2|about" }, "/about", known)).toEqual([]);
+    expect(parseWorkspace({ w: "1|%ZZ|about" }, "/about", known)).toMatchObject(
+      [{ path: "/about" }],
+    );
+  });
+
+  it("restores a minimized fullscreen window from the compact format", () => {
+    const search = serializeWorkspace({}, [
+      {
+        framing: {
+          position: { x: 0, y: 0 },
+          size: { height: 100, width: 100 },
+          unit: "percent",
+        },
+        id: "/about",
+        isFullscreen: true,
+        isHidden: true,
+        previousFraming: framing,
+        zIndex: 1,
+      },
+    ]);
+    expect(search.w).toBe("1|about,hf,10,12,60,70");
+    expect(parseWorkspace(search, "/", known)[0]).toMatchObject({
+      isFullscreen: true,
+      isHidden: true,
+      previousFraming: framing,
+    });
+    expect(
+      parseWorkspace({ w: `1|${"about|".repeat(33)}` }, "/", known),
+    ).toEqual([]);
   });
 
   it("ignores unknown or duplicate app routes and unsupported versions", () => {

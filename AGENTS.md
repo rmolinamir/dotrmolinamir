@@ -23,6 +23,8 @@ Command sources
 Build/lint/test guidance
 - Use the scripts defined in the package.json files listed above.
 - When running a single test, follow the package test script and pass file path or `-t` as supported by Vitest.
+- Prefer Storybook stories with `play` for visual interactions; use Vitest for
+  nonvisual logic, hooks, and routing contracts.
 
 Code style sources
 - Formatting and lint rules: `biome.json` and package-level `biome.json` files.
@@ -56,9 +58,9 @@ Error handling
 - Avoid swallowing errors; log or return safe values.
 
 Specs
-- Primary spec: `specs/personal-website.md`.
-- Roadmap: `specs/roadmap.md`.
-- Update specs when behavior changes.
+- `specs/roadmap.md` tracks upcoming work; active specs describe unfinished
+  features. Completed and historical specs live in `specs/archive/`.
+- Update the relevant spec or roadmap when product behavior changes.
 
 Notes
 - Keep deployment notes high-level and refer to `apphosting.yaml` for config.

@@ -26,6 +26,7 @@ import {
 import { WindowSnap } from "@acme/ui/os/window-snap";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import * as React from "react";
+import { expect, within } from "storybook/test";
 import { FloatingHiddenWindows } from "../scenes/taskbar/floating-hidden-windows";
 
 const meta = {
@@ -306,6 +307,23 @@ export const WithSnapping: Story = {
 };
 
 export const WithControls: Story = {
+  play: async ({ canvasElement, userEvent }) => {
+    const canvas = within(canvasElement);
+    const hide = canvas.getAllByRole("button", { name: "Hide" })[2];
+    if (!hide) throw new Error("Expected a window hide control");
+    const window = hide.closest('[data-slot="window"]');
+    if (!window) throw new Error("Expected a window around the hide control");
+
+    await userEvent.click(hide);
+    await expect(window).toHaveAttribute("data-hidden", "true");
+    await userEvent.click(canvas.getByRole("button", { name: "Show" }));
+    await expect(window).toHaveAttribute("data-hidden", "false");
+
+    const fullscreen = canvas.getAllByRole("button", { name: "Fullscreen" })[2];
+    if (!fullscreen) throw new Error("Expected a fullscreen control");
+    await userEvent.click(fullscreen);
+    await expect(window).toHaveAttribute("data-fullscreen", "true");
+  },
   render: () => (
     <TooltipProvider>
       <WindowManagerProvider>

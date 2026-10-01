@@ -6,6 +6,8 @@ export type WorkspaceSearch = Record<string, unknown>;
 
 const MAX_WINDOWS = 32;
 const MAX_WORKSPACE_KEYS = MAX_WINDOWS * 16;
+const MAX_COMPACT_LENGTH = 4096;
+const COMPACT_VERSION = "1";
 const fullFrame: WindowPercentFraming = {
   position: { x: 0, y: 0 },
   size: { height: 100, width: 100 },
@@ -14,6 +16,7 @@ const fullFrame: WindowPercentFraming = {
 
 function isWorkspaceKey(key: string) {
   return (
+    key === "w" ||
     key === "workspace" ||
     key === "windows" ||
     key === "window" ||
@@ -77,8 +80,60 @@ function flag(value: unknown) {
   return value === true || value === "true" || value === 1 || value === "1";
 }
 
+function parseCompactWorkspace(
+  value: unknown,
+  isApplicationPath: (path: string) => boolean,
+): WorkspaceWindow[] {
+  if (typeof value !== "string" || value.length > MAX_COMPACT_LENGTH) return [];
+  const [version, ...entries] = value.split("|");
+  if (version !== COMPACT_VERSION || entries.length > MAX_WINDOWS) return [];
+
+  const paths = new Set<string>();
+  const windows: WorkspaceWindow[] = [];
+  for (const entry of entries) {
+    const [encodedPath, ...fields] = entry.split(",");
+    if (!encodedPath) continue;
+    let path: string;
+    try {
+      path = `/${decodeURIComponent(encodedPath)}`;
+    } catch {
+      continue;
+    }
+    if (!isApplicationPath(path) || paths.has(path)) continue;
+    paths.add(path);
+
+    const state = fields[0];
+    const isFullscreen = state === "f" || state === "hf";
+    const isHidden = state === "h" || state === "hf";
+    const geometry = isFullscreen || isHidden ? fields.slice(1) : fields;
+    const [x, y, width, height] = geometry;
+    const savedFrame = frame(x, y, width, height);
+    const window: WorkspaceWindow = {
+      isFullscreen,
+      isHidden,
+      path,
+      previousFraming: isFullscreen ? (savedFrame ?? null) : null,
+      zIndex: windows.length + 1,
+    };
+    if (savedFrame || isFullscreen)
+      window.framing = isFullscreen ? fullFrame : savedFrame;
+    windows.push(window);
+  }
+  return windows;
+}
+
 /** Only registered local application routes can be restored from URL input. */
 export function parseWorkspace(
+  search: WorkspaceSearch,
+  pathname: string,
+  isApplicationPath: (path: string) => boolean,
+): WorkspaceWindow[] {
+  if (search.w !== undefined)
+    return parseCompactWorkspace(search.w, isApplicationPath);
+  return parseLegacyWorkspace(search, pathname, isApplicationPath);
+}
+
+function parseLegacyWorkspace(
   search: WorkspaceSearch,
   pathname: string,
   isApplicationPath: (path: string) => boolean,
@@ -138,22 +193,21 @@ export function parseWorkspace(
   return [...windows].sort((a, b) => a.zIndex - b.zIndex);
 }
 
-function writeFrame(
-  search: WorkspaceSearch,
-  prefix: string,
-  value: WindowPercentFraming,
-) {
+function compactFrame(value: WindowPercentFraming | undefined): number[] {
+  if (!value) return [];
   const normalized = frame(
     value.position.x,
     value.position.y,
     value.size.width,
     value.size.height,
   );
-  if (!normalized) return;
-  search[`${prefix}[position][x]`] = normalized.position.x;
-  search[`${prefix}[position][y]`] = normalized.position.y;
-  search[`${prefix}[size][width]`] = normalized.size.width;
-  search[`${prefix}[size][height]`] = normalized.size.height;
+  if (!normalized) return [];
+  return [
+    normalized.position.x,
+    normalized.position.y,
+    normalized.size.width,
+    normalized.size.height,
+  ].map((value) => Math.round(value * 100) / 100);
 }
 
 /** Replace only workspace fields, preserving other query parameters. */
@@ -165,25 +219,22 @@ export function serializeWorkspace(
     Object.entries(search).filter(([key]) => !isWorkspaceKey(key)),
   );
   if (!windows.length) return result;
-  result.workspace = 1;
-  for (const [index, window] of [...windows]
+  const entries = [...windows]
     .sort((a, b) => a.zIndex - b.zIndex)
     .slice(-MAX_WINDOWS)
-    .entries()) {
-    const prefix = `windows[${index}]`;
-    result[`${prefix}[path]`] = window.id;
-    result[`${prefix}[zIndex]`] = index + 1;
-    if (window.framing) writeFrame(result, prefix, window.framing);
-    if (window.isHidden) result[`${prefix}[isHidden]`] = true;
-    if (window.isFullscreen) {
-      result[`${prefix}[isFullscreen]`] = true;
-      if (window.previousFraming)
-        writeFrame(
-          result,
-          `${prefix}[previousFraming]`,
-          window.previousFraming,
-        );
-    }
-  }
+    .map((window) => {
+      const path = encodeURIComponent(window.id.slice(1));
+      if (window.isFullscreen) {
+        return [
+          path,
+          window.isHidden ? "hf" : "f",
+          ...compactFrame(window.previousFraming ?? undefined),
+        ].join(",");
+      }
+      if (window.isHidden)
+        return [path, "h", ...compactFrame(window.framing)].join(",");
+      return [path, ...compactFrame(window.framing)].join(",");
+    });
+  result.w = [COMPACT_VERSION, ...entries].join("|");
   return result;
 }
