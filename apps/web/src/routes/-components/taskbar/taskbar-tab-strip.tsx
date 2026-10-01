@@ -44,6 +44,7 @@ export function TaskbarTabStrip({
     <TabStrip
       className={cn("w-full min-w-0 flex-1 border-none", className)}
       value={activeWindow?.id ?? ""}
+      onValueChange={activateWindow}
       {...props}
     >
       <TabStripRail>
@@ -54,7 +55,6 @@ export function TaskbarTabStrip({
                 <TabStripTabTrigger
                   id={`tab-${application.id}`}
                   value={application.id}
-                  onClick={() => activateWindow(application.id)}
                   onDoubleClick={() => hideWindow(application.id)}
                 >
                   <TabStripTitle>{application.metadata.title}</TabStripTitle>

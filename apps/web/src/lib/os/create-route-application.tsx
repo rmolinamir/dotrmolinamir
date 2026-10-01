@@ -21,6 +21,10 @@ import { Maximize, Minimize, Minus, X } from "lucide-react";
 import React, { useEffect } from "react";
 import { useSystem } from "@/routes/-components/system/system-provider";
 import type { FileRoutesByTo } from "../../routeTree.gen";
+import {
+  registerApplicationRoute,
+  useApplicationRoute,
+} from "./application-routing";
 
 type RouteApplicationDefinition = ApplicationDefinition & {
   launcher: ApplicationDefinition["component"];
@@ -35,6 +39,19 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
     launcher: LauncherComponent,
     ...applicationFactoryDefinition
   }: RouteApplicationDefinition) => {
+    function LoadingApplication() {
+      const { insertLoadingApplication, removeLoadingApplication } =
+        useSystem();
+      const { application } = useApplication();
+
+      React.useEffect(() => {
+        insertLoadingApplication(application);
+        return () => removeLoadingApplication(application);
+      }, [application, insertLoadingApplication, removeLoadingApplication]);
+
+      return FallbackComponent ? <FallbackComponent /> : null;
+    }
+
     const Application = applicationFactory({
       ...applicationFactoryDefinition,
       component: () => {
@@ -56,13 +73,13 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
           });
         });
 
-        const { isFullscreen } = getWindowData(id) ?? {};
+        const { isFullscreen, framing } = getWindowData(id) ?? {};
 
         useEffect(() => {
-          if (isMobile && !isFullscreen) {
+          if (isMobile && framing && !isFullscreen) {
             toggleFullscreen(id);
           }
-        }, [isMobile, isFullscreen, toggleFullscreen, id]);
+        }, [isMobile, isFullscreen, framing, toggleFullscreen, id]);
 
         return (
           <Window defaultFraming={defaultFraming ?? undefined}>
@@ -86,42 +103,19 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
                 </WindowCloseButton>
               </WindowControls>
             </WindowHeader>
-            <ApplicationComponent />
+            <React.Suspense fallback={<LoadingApplication />}>
+              <ApplicationComponent />
+            </React.Suspense>
           </Window>
         );
       },
-      fallback: () => {
-        const { insertLoadingApplication, removeLoadingApplication } =
-          useSystem();
-        const { application } = Application.useApplication();
-
-        const onLoadStart = React.useEffectEvent(() => {
-          insertLoadingApplication(application);
-        });
-
-        const onLoadEnd = React.useEffectEvent(() => {
-          removeLoadingApplication(application);
-        });
-
-        React.useEffect(() => {
-          onLoadStart();
-          return onLoadEnd;
-        }, []);
-
-        if (FallbackComponent) return <FallbackComponent />;
-      },
     });
 
-    function Launcher() {
-      const { launchWindow } = Application.useApplication();
+    registerApplicationRoute(toPath);
 
+    function Launcher() {
       return (
-        <LauncherPrimitive
-          onClick={() => {
-            launchWindow();
-          }}
-          asChild
-        >
+        <LauncherPrimitive asChild>
           <Link to={toPath}>
             <LauncherComponent />
           </Link>
@@ -131,15 +125,7 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
 
     function Route({ children }: React.PropsWithChildren) {
       const { launchWindow } = Application.useApplication();
-
-      const launch = React.useEffectEvent(() => {
-        launchWindow();
-      });
-
-      React.useEffect(() => {
-        launch();
-      }, []);
-
+      useApplicationRoute(toPath, launchWindow);
       return children;
     }
 

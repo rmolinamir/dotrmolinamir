@@ -8,6 +8,10 @@
 - Power shutdown flow. (complete)
 - App shells: About, Doom, Resume. (complete)
 
+## Completed improvements
+
+- Active-window routing and workspace URL persistence: URL follows the active window, restores window layouts after reload, and uses `/` when no windows are visible. (complete; [routing contract](application-routing.md), [#69](https://github.com/rmolinamir/dotrmolinamir/issues/69))
+
 ## Next
 
 - Blog app (primary content surface).

@@ -8,7 +8,7 @@ export function useQuitApplications() {
 
   const quitApplications = React.useCallback(() => {
     closeAll();
-    navigate({ to: "/" });
+    navigate({ replace: true, to: "/" });
   }, [closeAll, navigate]);
 
   return { quitApplications };
