@@ -16,6 +16,7 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  defaultStringifySearch,
   Outlet,
   RouterProvider,
 } from "@tanstack/react-router";
@@ -39,6 +40,7 @@ import {
 import { TaskbarTabStrip } from "@/routes/-components/taskbar/taskbar-tab-strip";
 import { ApplicationRoutingProvider } from "./application-routing";
 import { createApplicationRoute } from "./create-route-application";
+import { parseWorkspace, serializeWorkspace } from "./workspace-url";
 
 function Counter() {
   const [count, setCount] = React.useState(0);
@@ -140,7 +142,7 @@ function setup({
     history,
     routeTree: root.addChildren([home, aboutRoute, doomRoute]),
   });
-  render(
+  const rendered = render(
     <React.StrictMode>
       <RouterProvider router={router} />
     </React.StrictMode>,
@@ -166,6 +168,7 @@ function setup({
       });
     },
     router,
+    unmount: rendered.unmount,
   };
 }
 
@@ -178,6 +181,172 @@ function windowFor(title: string) {
 }
 
 describe("active-window routing", () => {
+  const frame = {
+    position: { x: 10, y: 15 },
+    size: { height: 70, width: 60 },
+    unit: "percent" as const,
+  };
+  const isApp = (path: string) => path === "/about" || path === "/doom";
+
+  it("restores a multi-window workspace on direct load and refresh", async () => {
+    const search = serializeWorkspace({ campaign: "test" }, [
+      { framing: frame, id: "/about", isHidden: true, zIndex: 1 },
+      {
+        framing: { ...frame, position: { x: 25, y: 20 } },
+        id: "/doom",
+        zIndex: 2,
+      },
+    ]);
+    const app = setup({
+      initialEntries: [`/doom${defaultStringifySearch(search)}#bookmark`],
+    });
+    await app.expectPath("/doom");
+    await waitFor(() =>
+      expect(app.managers.windows.getFraming("/about")).toEqual(frame),
+    );
+    expect(app.managers.windows.getIsHidden("/about")).toBe(true);
+    expect(app.managers.applications.runningApplications).toHaveLength(2);
+    expect(
+      (app.router.state.location.search as Record<string, unknown>).campaign,
+    ).toBe("test");
+    expect(app.router.state.location.hash).toBe("bookmark");
+    const url = app.router.state.location.href;
+    app.unmount();
+    const refreshed = setup({ initialEntries: [url] });
+    await refreshed.expectPath("/doom");
+    await waitFor(() =>
+      expect(refreshed.managers.windows.getFraming("/about")).toEqual(frame),
+    );
+    expect(refreshed.managers.windows.getIsHidden("/about")).toBe(true);
+    expect(refreshed.managers.applications.runningApplications).toHaveLength(2);
+  });
+
+  it("keeps all-minimized workspaces at / across refresh and restores from the taskbar", async () => {
+    const search = serializeWorkspace({}, [
+      { framing: frame, id: "/about", isHidden: true, zIndex: 1 },
+      { framing: frame, id: "/doom", isHidden: true, zIndex: 2 },
+    ]);
+    const app = setup({
+      initialEntries: [`/${defaultStringifySearch(search)}`],
+    });
+    await waitFor(() =>
+      expect(app.managers.applications.runningApplications).toHaveLength(2),
+    );
+    await app.expectPath("/");
+    expect(app.managers.windows.getIsHidden("/about")).toBe(true);
+    expect(app.managers.windows.getIsHidden("/doom")).toBe(true);
+    fireEvent.focus(screen.getByRole("tab", { name: "About" }));
+    await app.expectPath("/about");
+  });
+
+  it("persists geometry/fullscreen and restores the original frame on exiting fullscreen", async () => {
+    const app = setup({ initialEntries: ["/about?campaign=test#bookmark"] });
+    await app.expectPath("/about");
+    const historyLength = app.history.length;
+    act(() => app.managers.windows.setFraming("/about", frame));
+    await waitFor(() =>
+      expect(
+        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
+          ?.framing,
+      ).toEqual(frame),
+    );
+    act(() => app.managers.windows.toggleFullscreen("/about"));
+    await waitFor(() =>
+      expect(
+        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
+          ?.isFullscreen,
+      ).toBe(true),
+    );
+    expect(app.history.length).toBe(historyLength);
+    expect(
+      (app.router.state.location.search as Record<string, unknown>).campaign,
+    ).toBe("test");
+    expect(app.router.state.location.hash).toBe("bookmark");
+    const url = app.router.state.location.href;
+    app.unmount();
+    const refreshed = setup({ initialEntries: [url] });
+    await refreshed.expectPath("/about");
+    await waitFor(() =>
+      expect(refreshed.managers.windows.getIsFullscreen("/about")).toBe(true),
+    );
+    act(() => refreshed.managers.windows.toggleFullscreen("/about"));
+    expect(refreshed.managers.windows.getFraming("/about")).toEqual(frame);
+  });
+
+  it("merges a shared layout without closing other apps or resetting their content", async () => {
+    const app = setup({ initialEntries: ["/about"] });
+    await app.expectPath("/about");
+    fireEvent.click(screen.getByText("Count 0"));
+    const search = serializeWorkspace({}, [
+      { framing: frame, id: "/doom", zIndex: 1 },
+    ]);
+    await act(async () => {
+      await app.router.navigate({ search, to: "/doom" });
+    });
+    await app.expectPath("/doom");
+    expect(app.managers.applications.runningApplications).toHaveLength(2);
+    expect(screen.getByText("Count 1")).toBeDefined();
+    expect(app.managers.windows.getFraming("/doom")).toEqual(frame);
+  });
+
+  it("replays saved layout from a history destination", async () => {
+    const app = setup({ initialEntries: ["/about"] });
+    await app.expectPath("/about");
+    act(() => app.managers.windows.setFraming("/about", frame));
+    await waitFor(() =>
+      expect(
+        parseWorkspace(app.router.state.location.search, "/about", isApp)[0]
+          ?.framing,
+      ).toEqual(frame),
+    );
+    await app.navigate("/doom");
+    await app.expectPath("/doom");
+    act(() =>
+      app.managers.windows.setFraming("/about", {
+        ...frame,
+        position: { x: 20, y: 20 },
+      }),
+    );
+    act(() => app.history.back());
+    await app.expectPath("/about");
+    await waitFor(() =>
+      expect(app.managers.windows.getFraming("/about")).toEqual(frame),
+    );
+  });
+
+  it("lets the pathname override contradictory saved focus and hidden state", async () => {
+    const search = serializeWorkspace({}, [
+      { framing: frame, id: "/about", isHidden: true, zIndex: 1 },
+      { framing: frame, id: "/doom", zIndex: 2 },
+    ]);
+    const app = setup({
+      initialEntries: [`/about${defaultStringifySearch(search)}`],
+    });
+    await app.expectPath("/about");
+    await waitFor(() =>
+      expect(app.managers.windows.getFraming("/doom")).toEqual(frame),
+    );
+    await app.expectPath("/about");
+    expect(app.managers.windows.getIsHidden("/about")).toBe(false);
+  });
+
+  it("ignores unknown apps and invalid geometry without blocking route launch", async () => {
+    const app = setup({
+      initialEntries: [
+        "/about?windows[0][path]=/missing&windows[1][path]=/doom&windows[1][size][width]=NaN",
+      ],
+    });
+    await app.expectPath("/about");
+    await waitFor(() =>
+      expect(app.managers.applications.runningApplications).toHaveLength(2),
+    );
+    expect(
+      app.managers.applications.runningApplications.some(
+        (app) => app.id === "/missing",
+      ),
+    ).toBe(false);
+  });
+
   it.each([
     "navigation",
     "window focus",
@@ -417,6 +586,9 @@ describe("active-window routing", () => {
     fireEvent.keyDown(document.body, { key: "W", shiftKey: true });
     await app.expectPath("/");
     expect(app.managers.applications.runningApplications).toHaveLength(0);
+    expect(
+      parseWorkspace(app.router.state.location.search, "/", isApp),
+    ).toEqual([]);
   });
 
   it("uses / when all windows are hidden and does not restore them during synchronization", async () => {

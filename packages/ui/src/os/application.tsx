@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useApplicationManager } from "./application-manager";
+import { registerApplication } from "./application-registry";
 import { useWindowManager } from "./window-manager";
 
 type ApplicationDefinition = {
@@ -33,6 +34,7 @@ function defineApplication(applicationId: string) {
       id: applicationId,
       metadata: definition.metadata,
     };
+    registerApplication(application);
 
     return {
       Component: () => {
@@ -101,3 +103,5 @@ export {
   type ApplicationDefinition,
   type ApplicationInstance,
 };
+
+export { getApplication } from "./application-registry";

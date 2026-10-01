@@ -30,6 +30,7 @@ export type WindowManagerContextValue = {
   hideWindow: (id: string) => void;
   setFraming: (id: string, framing: WindowPercentFraming) => void;
   toggleFullscreen: (id: string) => void;
+  restoreWindowLayout: (layout: ReadonlyArray<WindowInstance>) => void;
 };
 
 const WindowManagerContext =
@@ -250,6 +251,34 @@ function WindowManagerProvider({ children }: WindowManagerProps) {
     });
   }, []);
 
+  // Apply a saved layout atomically after its windows have mounted. Windows
+  // omitted from the layout remain running, behind the restored windows.
+  const restoreWindowLayout = React.useCallback(
+    (layout: ReadonlyArray<WindowInstance>) => {
+      setState((prev) => {
+        const restored = layout.filter((entry) =>
+          prev.windows.some((window) => window.id === entry.id),
+        );
+        const ids = new Set(restored.map((entry) => entry.id));
+        const ordered = [
+          ...prev.windows.filter((window) => !ids.has(window.id)),
+          ...[...restored].sort((a, b) => a.zIndex - b.zIndex),
+        ];
+        const windows = ordered.map((entry, index) => ({
+          id: entry.id,
+          zIndex: index + 1,
+        }));
+        const map = { ...prev.map };
+        for (const entry of restored)
+          map[entry.id] = { ...map[entry.id], ...entry };
+        for (const window of windows)
+          map[window.id] = { ...map[window.id], ...window };
+        return { focusedId: findTopWindow(windows, map)?.id, map, windows };
+      });
+    },
+    [],
+  );
+
   const value = React.useMemo<WindowManagerContextValue>(
     () => ({
       activateWindow,
@@ -261,6 +290,7 @@ function WindowManagerProvider({ children }: WindowManagerProps) {
       getWindowData,
       hideWindow,
       mountWindow,
+      restoreWindowLayout,
       setFraming: setFraming,
       toggleFullscreen,
       unmountWindow,
@@ -280,6 +310,7 @@ function WindowManagerProvider({ children }: WindowManagerProps) {
       state.focusedId,
       state.windows,
       toggleFullscreen,
+      restoreWindowLayout,
     ],
   );
 

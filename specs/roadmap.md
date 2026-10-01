@@ -10,7 +10,7 @@
 
 ## Completed improvements
 
-- Active-window routing: URL follows the active window; `/` when no windows are open or all are minimized. (complete; [routing contract](application-routing.md), [#69](https://github.com/rmolinamir/dotrmolinamir/issues/69))
+- Active-window routing and workspace URL persistence: URL follows the active window, restores window layouts after reload, and uses `/` when no windows are visible. (complete; [routing contract](application-routing.md), [#69](https://github.com/rmolinamir/dotrmolinamir/issues/69))
 
 ## Next
 

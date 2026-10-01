@@ -1,9 +1,18 @@
+import { getApplication } from "@acme/ui/os/application";
 import { useApplicationManager } from "@acme/ui/os/application-manager";
-import { useWindowManager } from "@acme/ui/os/window-manager";
+import {
+  useWindowManager,
+  type WindowInstance,
+} from "@acme/ui/os/window-manager";
 import { useRouter, useRouterState } from "@tanstack/react-router";
 import * as React from "react";
 import { useSystem } from "@/routes/-components/system/system-provider";
 import type { FileRoutesByTo } from "../../routeTree.gen";
+import {
+  parseWorkspace,
+  serializeWorkspace,
+  type WorkspaceWindow,
+} from "./workspace-url";
 
 declare module "@tanstack/react-router" {
   interface HistoryState {
@@ -27,6 +36,9 @@ type Navigation = {
   path: string;
   isWindowSync: boolean;
   launched: boolean;
+  workspace: WorkspaceWindow[];
+  workspaceLaunched: boolean;
+  workspaceApplied: boolean;
 };
 
 const ApplicationRoutingContext = React.createContext<
@@ -39,9 +51,15 @@ export function ApplicationRoutingProvider({
   const router = useRouter();
   const { location, status, isLoading, matches, statusCode } = useRouterState();
   const { power } = useSystem();
-  const { runningApplications } = useApplicationManager();
-  const { focusedId, windows, getWindowData, activateWindow, hideWindow } =
-    useWindowManager();
+  const { runningApplications, launch, isRunning } = useApplicationManager();
+  const {
+    focusedId,
+    windows,
+    getWindowData,
+    activateWindow,
+    hideWindow,
+    restoreWindowLayout,
+  } = useWindowManager();
   const navigation = React.useRef<Navigation | undefined>(undefined);
   const pendingSync = React.useRef<string | undefined>(undefined);
   const pendingActivation = React.useRef<string | null | undefined>(undefined);
@@ -77,7 +95,17 @@ export function ApplicationRoutingProvider({
         pendingSync.current !== undefined &&
         location.state.applicationWindowSync === pendingSync.current;
       pendingSync.current = undefined;
-      navigation.current = { isWindowSync, key, launched: false, path };
+      navigation.current = {
+        isWindowSync,
+        key,
+        launched: false,
+        path,
+        workspace: isWindowSync
+          ? []
+          : parseWorkspace(location.search, path, isApplicationPath),
+        workspaceApplied: false,
+        workspaceLaunched: false,
+      };
       if (!isWindowSync) pendingActivation.current = path === "/" ? null : path;
     }
     return navigation.current;
@@ -103,6 +131,22 @@ export function ApplicationRoutingProvider({
     const current = getNavigation();
     if (!current) return;
 
+    // Active-route launches still belong to Route -> launchWindow. Other apps
+    // named in the snapshot resolve through the same application definitions.
+    if (!current.workspaceLaunched) {
+      current.workspaceLaunched = true;
+      let launching = false;
+      for (const entry of current.workspace) {
+        if (entry.path === current.path) continue;
+        const application = getApplication(entry.path);
+        if (application && !isRunning(application)) {
+          launch(application);
+          launching = true;
+        }
+      }
+      if (launching) return;
+    }
+
     // Window registration/cleanup follows the application commit. Do not
     // synchronize an intermediate frame back into a route-driven launch.
     if (
@@ -112,6 +156,15 @@ export function ApplicationRoutingProvider({
       )
     )
       return;
+
+    if (current.workspace.length && !current.workspaceApplied) {
+      if (current.workspace.some((entry) => !getWindowData(entry.path))) return;
+      current.workspaceApplied = true;
+      restoreWindowLayout(
+        current.workspace.map(({ path, ...entry }) => ({ ...entry, id: path })),
+      );
+      return;
+    }
 
     // The route's launchWindow call may not have committed yet. Also restore
     // its requested focus when the desktop remounts after a not-found screen.
@@ -136,13 +189,25 @@ export function ApplicationRoutingProvider({
       isApplicationPath(focusedWindow.id)
         ? focusedWindow.id
         : "/";
-    if (current.path === to) return;
+    const layout = windows
+      .map((window) => getWindowData(window.id))
+      .filter((window): window is WindowInstance =>
+        Boolean(window && isApplicationPath(window.id)),
+      );
+    const search = serializeWorkspace(location.search, layout);
+    if (
+      current.path === to &&
+      router.options.stringifySearch(search) === location.searchStr
+    )
+      return;
 
     const syncId = crypto.randomUUID();
     pendingSync.current = syncId;
     void router.navigate({
+      hash: location.hash,
       replace: true,
       resetScroll: false,
+      search,
       state: { applicationWindowSync: syncId },
       to,
     });
@@ -155,6 +220,12 @@ export function ApplicationRoutingProvider({
     getWindowData,
     activateWindow,
     hideWindow,
+    restoreWindowLayout,
+    launch,
+    isRunning,
+    location.search,
+    location.searchStr,
+    location.hash,
   ]);
 
   return (

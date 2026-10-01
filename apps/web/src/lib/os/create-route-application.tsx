@@ -73,13 +73,13 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
           });
         });
 
-        const { isFullscreen } = getWindowData(id) ?? {};
+        const { isFullscreen, framing } = getWindowData(id) ?? {};
 
         useEffect(() => {
-          if (isMobile && !isFullscreen) {
+          if (isMobile && framing && !isFullscreen) {
             toggleFullscreen(id);
           }
-        }, [isMobile, isFullscreen, toggleFullscreen, id]);
+        }, [isMobile, isFullscreen, framing, toggleFullscreen, id]);
 
         return (
           <Window defaultFraming={defaultFraming ?? undefined}>
