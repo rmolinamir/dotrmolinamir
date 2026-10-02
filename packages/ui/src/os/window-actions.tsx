@@ -225,8 +225,8 @@ function WindowCloseButton({
 
 export {
   WindowAction,
-  WindowControls,
-  WindowHideButton,
-  WindowFullscreenButton,
   WindowCloseButton,
+  WindowControls,
+  WindowFullscreenButton,
+  WindowHideButton,
 };

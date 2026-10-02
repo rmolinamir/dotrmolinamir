@@ -77,4 +77,4 @@ function useWindowBoundary() {
   return context;
 }
 
-export { WindowBoundary, useWindowBoundary };
+export { useWindowBoundary, WindowBoundary };

@@ -96,12 +96,11 @@ function useApplicationId(): string | undefined {
   return context?.id;
 }
 
+export { getApplication } from "./application-registry";
 export {
+  type ApplicationDefinition,
+  type ApplicationInstance,
   defineApplication,
   useApplication,
   useApplicationId,
-  type ApplicationDefinition,
-  type ApplicationInstance,
 };
-
-export { getApplication } from "./application-registry";

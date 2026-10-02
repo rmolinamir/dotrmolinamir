@@ -76,8 +76,10 @@ export function getParentElement(rndRef: RefObject<Rnd | null>) {
 
 export function getPointerPosition(event: RndDraggableEvent | null) {
   if (!event) return null;
-  if ("touches" in event) {
-    const touch = event.touches[0] ?? event.changedTouches[0];
+  if ("touches" in event && "changedTouches" in event) {
+    const touches = event.touches as TouchList;
+    const changedTouches = event.changedTouches as TouchList;
+    const touch = touches[0] ?? changedTouches[0];
     if (!touch) return null;
     return { x: touch.clientX, y: touch.clientY };
   }

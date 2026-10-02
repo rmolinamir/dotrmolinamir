@@ -142,10 +142,10 @@ function TabStripClose({
 
 export {
   TabStrip,
-  TabStripRail,
+  TabStripClose,
   TabStripList,
+  TabStripRail,
   TabStripTab,
   TabStripTabTrigger,
   TabStripTitle,
-  TabStripClose,
 };

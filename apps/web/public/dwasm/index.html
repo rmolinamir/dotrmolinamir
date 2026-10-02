@@ -537,7 +537,7 @@
           // Same-origin check (since you host /dwasm)
           if (event.origin !== window.location.origin) return;
           const msg = event.data;
-          if (!msg || msg.type !== "BOOT") return;
+          if (msg?.type !== "BOOT") return;
 
           setStatus(`Host ready. Booting ${msg.iwad || "freedoom1"}…`);
 

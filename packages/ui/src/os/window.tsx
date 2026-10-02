@@ -438,16 +438,14 @@ function useWindow() {
   return context;
 }
 
-export { Window, useWindow };
-
 export type {
   WindowPercentFraming,
   WindowPixelFraming,
   WindowPosition,
   WindowSize,
 } from "./window-utils";
-
 export {
   getCascadingWindowFraming,
   getCenteredWindowFraming,
 } from "./window-utils";
+export { useWindow, Window };

@@ -200,10 +200,10 @@ function ApplicationWindow({ title, children }: ApplicationWindowProps) {
 }
 
 export {
-  MailApplication,
-  NotesApplication,
   InsightsApplication,
-  MailApplicationLauncher,
-  NotesApplicationLauncher,
   InsightsApplicationLauncher,
+  MailApplication,
+  MailApplicationLauncher,
+  NotesApplication,
+  NotesApplicationLauncher,
 };
