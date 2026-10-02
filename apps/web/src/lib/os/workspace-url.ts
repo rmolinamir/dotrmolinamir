@@ -5,8 +5,12 @@ export type WorkspaceWindow = Omit<WindowInstance, "id"> & { path: string };
 export type WorkspaceSearch = Record<string, unknown>;
 
 const MAX_WINDOWS = 32;
-const MAX_COMPACT_LENGTH = 4096;
-const COMPACT_VERSION = "1";
+const WORKSPACE_QUERY_KEY = "w";
+const WINDOW_STATE = {
+  fullscreen: "f",
+  hidden: "h",
+  hiddenFullscreen: "hf",
+} as const;
 const fullFrame: WindowPercentFraming = {
   position: { x: 0, y: 0 },
   size: { height: 100, width: 100 },
@@ -15,7 +19,7 @@ const fullFrame: WindowPercentFraming = {
 
 function isWorkspaceKey(key: string) {
   return (
-    key === "w" ||
+    key === WORKSPACE_QUERY_KEY ||
     key === "workspace" ||
     key === "windows" ||
     key === "window" ||
@@ -71,10 +75,10 @@ export function parseWorkspace(
   search: WorkspaceSearch,
   isApplicationPath: (path: string) => boolean,
 ): WorkspaceWindow[] {
-  const value = search.w;
-  if (typeof value !== "string" || value.length > MAX_COMPACT_LENGTH) return [];
+  const value = search[WORKSPACE_QUERY_KEY];
+  if (typeof value !== "string") return [];
   const [version, ...entries] = value.split("|");
-  if (version !== COMPACT_VERSION || entries.length > MAX_WINDOWS) return [];
+  if (version !== "1" || entries.length > MAX_WINDOWS) return [];
 
   const paths = new Set<string>();
   const windows: WorkspaceWindow[] = [];
@@ -91,8 +95,11 @@ export function parseWorkspace(
     paths.add(path);
 
     const state = fields[0];
-    const isFullscreen = state === "f" || state === "hf";
-    const isHidden = state === "h" || state === "hf";
+    const isFullscreen =
+      state === WINDOW_STATE.fullscreen ||
+      state === WINDOW_STATE.hiddenFullscreen;
+    const isHidden =
+      state === WINDOW_STATE.hidden || state === WINDOW_STATE.hiddenFullscreen;
     const geometry = isFullscreen || isHidden ? fields.slice(1) : fields;
     const [x, y, width, height] = geometry;
     const savedFrame = frame(x, y, width, height);
@@ -110,7 +117,7 @@ export function parseWorkspace(
   return windows;
 }
 
-function compactFrame(value: WindowPercentFraming | undefined): number[] {
+function frameValues(value: WindowPercentFraming | undefined): number[] {
   if (!value) return [];
   const normalized = frame(
     value.position.x,
@@ -144,14 +151,18 @@ export function serializeWorkspace(
       if (window.isFullscreen) {
         return [
           path,
-          window.isHidden ? "hf" : "f",
-          ...compactFrame(window.previousFraming ?? undefined),
+          window.isHidden
+            ? WINDOW_STATE.hiddenFullscreen
+            : WINDOW_STATE.fullscreen,
+          ...frameValues(window.previousFraming ?? undefined),
         ].join(",");
       }
       if (window.isHidden)
-        return [path, "h", ...compactFrame(window.framing)].join(",");
-      return [path, ...compactFrame(window.framing)].join(",");
+        return [path, WINDOW_STATE.hidden, ...frameValues(window.framing)].join(
+          ",",
+        );
+      return [path, ...frameValues(window.framing)].join(",");
     });
-  result.w = [COMPACT_VERSION, ...entries].join("|");
+  result[WORKSPACE_QUERY_KEY] = ["1", ...entries].join("|");
   return result;
 }

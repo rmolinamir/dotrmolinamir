@@ -59,7 +59,7 @@ Error handling
 
 Specs
 - `specs/roadmap.md` tracks upcoming work; active specs describe unfinished
-  features. Completed and historical specs live in `specs/archive/`.
+  features. Remove specs when their features are complete.
 - Update the relevant spec or roadmap when product behavior changes.
 
 Notes

@@ -29,7 +29,7 @@ This is a monorepo powered by [Turborepo](https://turborepo.dev/) and [pnpm](htt
 
 - **Web Application:** Found in [`apps/web`](./apps/web). Powered by TanStack Start, built by Vite and Nitro.
 - **Packages**: Found in [`packages`](./packages). Includes UI components, OS-themed windowing system, and other shared utilities.
-- **Specs:** Found in [`specs`](./specs). The roadmap tracks upcoming work; completed feature specs live in [`specs/archive`](./specs/archive).
+- **Specs:** Found in [`specs`](./specs). The roadmap tracks upcoming work; feature specs describe work in progress.
 
 ---
 
