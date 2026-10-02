@@ -98,7 +98,7 @@ describe("workspace URL format", () => {
     });
   });
 
-  it("accepts only compact workspace input and removes obsolete URL fields", () => {
+  it("accepts only workspace input and removes obsolete URL fields", () => {
     expect(parseWorkspace({}, known)).toEqual([]);
     expect(parseWorkspace({ workspace: 1 }, known)).toEqual([]);
     expect(parseWorkspace({ w: "2|about" }, known)).toEqual([]);

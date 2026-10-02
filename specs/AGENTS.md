@@ -1,18 +1,17 @@
 # Specs Guide
 
 Purpose
-- Explain how to work with the spec files in this repo.
-- Keep specs aligned with shipped behavior.
-- Use specs as the source of truth for product intent.
+- Explain how to use the roadmap and specs for unfinished work.
+- Keep planned behavior clear without retaining completed feature documents.
 
 What lives here
 - `specs/roadmap.md` lists only upcoming work.
-- Active specs describe unfinished features. `specs/archive/` holds completed
-  and historical specs, including the original personal website spec.
+- Feature specs describe work that has not shipped yet.
+- Shipped behavior is documented by the code and tests, not archived specs.
 
 How to use specs
 - Read relevant active specs and the roadmap before product or UX changes.
-- Use archived specs for background, then verify shipped behavior in code.
+- Check the code and tests for behavior that has already shipped.
 - Treat the roadmap as the backlog and priority signal.
 - Prefer updating specs in the same PR as behavior changes.
 
@@ -27,9 +26,8 @@ Writing guidelines
 - Reference code locations only when it clarifies ownership.
 - Avoid date-based or environment-specific statements.
 
-Completion and archive
-- When a feature ships, remove it from the roadmap and move its spec to
-  `specs/archive/`.
+Completion
+- When a feature ships, remove it from the roadmap and delete its spec.
 
 Notes
 - Specs are for humans first; keep them readable and concise.
