@@ -723,7 +723,6 @@ function SidebarMenuSubButton({
 
 export {
   Sidebar,
-  SidebarWrapper,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
@@ -746,5 +745,6 @@ export {
   SidebarRail,
   SidebarSeparator,
   SidebarTrigger,
+  SidebarWrapper,
   useSidebar,
 };

@@ -119,4 +119,4 @@ function useWindowSnap() {
   return React.useContext(WindowSnapContext);
 }
 
-export { WindowSnap, useWindowSnap };
+export { useWindowSnap, WindowSnap };

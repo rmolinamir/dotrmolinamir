@@ -124,8 +124,8 @@ function WindowFooter({
 }
 
 export {
-  WindowContent,
   WindowCaption,
+  WindowContent,
   WindowFooter,
   WindowHeader,
   WindowTitle,

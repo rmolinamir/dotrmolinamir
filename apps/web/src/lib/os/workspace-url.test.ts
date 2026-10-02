@@ -118,16 +118,14 @@ describe("workspace URL format", () => {
     ).toEqual({ campaign: "hello" });
   });
 
-  it.each([
-    "NaN",
-    "Infinity",
-    "",
-    "invalid",
-  ])("discards malformed geometry (%s) without discarding a valid app", (invalid) => {
-    const result = parseWorkspace({ w: `1|about,${invalid},0,60,70` }, known);
-    expect(result).toHaveLength(1);
-    expect(result[0]?.framing).toBeUndefined();
-  });
+  it.each(["NaN", "Infinity", "", "invalid"])(
+    "discards malformed geometry (%s) without discarding a valid app",
+    (invalid) => {
+      const result = parseWorkspace({ w: `1|about,${invalid},0,60,70` }, known);
+      expect(result).toHaveLength(1);
+      expect(result[0]?.framing).toBeUndefined();
+    },
+  );
 
   it("clamps geometry to the workspace and rounds to a stable precision", () => {
     expect(

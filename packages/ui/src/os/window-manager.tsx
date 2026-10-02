@@ -330,7 +330,7 @@ function useWindowManager() {
 }
 
 export {
-  WindowManagerProvider,
-  useWindowManager,
   findTopWindow as getTopWindow,
+  useWindowManager,
+  WindowManagerProvider,
 };
