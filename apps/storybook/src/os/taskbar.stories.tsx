@@ -8,7 +8,7 @@ import { WindowSnap } from "@acme/ui/os/window-snap";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { PanelRightOpen } from "lucide-react";
 import * as React from "react";
-import { expect, within } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 import { ApplicationManagerSidebar } from "../scenes/desktop/application-manager-sidebar";
 import {
   InsightsApplication,
@@ -36,11 +36,13 @@ export const Default: Story = {
   play: async ({ canvasElement, userEvent }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole("button", { name: "Orbit Desk" }));
-    await expect(
-      await within(document.body).findByRole("menuitem", {
-        name: /Mission control/,
-      }),
-    ).toBeVisible();
+    await waitFor(() =>
+      expect(
+        within(document.body).getByRole("menuitem", {
+          name: /Mission control/,
+        }),
+      ).toBeVisible(),
+    );
   },
   render: () => {
     const [sidebarOpen, setSidebarOpen] = React.useState(false);
