@@ -55,6 +55,12 @@ export function TaskbarTabStrip({
                 <TabStripTabTrigger
                   id={`tab-${application.id}`}
                   value={application.id}
+                  onFocus={() => activateWindow(application.id)}
+                  onMouseDown={(event) => {
+                    if (event.button === 0 && !event.ctrlKey) {
+                      activateWindow(application.id);
+                    }
+                  }}
                   onDoubleClick={() => hideWindow(application.id)}
                 >
                   <TabStripTitle>{application.metadata.title}</TabStripTitle>

@@ -1,5 +1,5 @@
-import { Slot } from "radix-ui";
 import type * as React from "react";
+import { Slot } from "../lib/slot";
 import { cn } from "../lib/utils";
 
 export type LauncherSize = "sm" | "md" | "lg";

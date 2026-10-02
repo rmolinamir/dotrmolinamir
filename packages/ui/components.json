@@ -9,7 +9,7 @@
   },
   "iconLibrary": "lucide",
   "rsc": false,
-  "style": "new-york",
+  "style": "base-vega",
   "tailwind": {
     "baseColor": "zinc",
     "config": "",

@@ -76,7 +76,7 @@ function TabStripTabTrigger({
       className={cn(
         "h-7 max-w-48 justify-start rounded-md border px-2 pr-6 text-foreground/70",
         "hover:bg-muted/60 hover:text-foreground",
-        "data-[state=active]:border-border/60! data-[state=active]:bg-background/90 data-[state=active]:text-foreground",
+        "data-active:border-border/60! data-active:bg-background/90 data-active:text-foreground",
         className,
       )}
       value={value}

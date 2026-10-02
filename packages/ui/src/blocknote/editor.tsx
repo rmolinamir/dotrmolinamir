@@ -14,6 +14,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -22,7 +23,6 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../components/dropdown-menu";
-import { Form } from "../components/form";
 import { Input } from "../components/input";
 import { Label } from "../components/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/popover";
@@ -75,6 +75,7 @@ export function BlockNoteEditor(props: BlockNoteEditorProps) {
           DropdownMenu,
           DropdownMenuCheckboxItem,
           DropdownMenuContent,
+          DropdownMenuGroup,
           DropdownMenuItem,
           DropdownMenuLabel,
           DropdownMenuSeparator,
@@ -82,9 +83,6 @@ export function BlockNoteEditor(props: BlockNoteEditorProps) {
           DropdownMenuSubContent,
           DropdownMenuSubTrigger,
           DropdownMenuTrigger,
-        },
-        Form: {
-          Form,
         },
         Input: {
           Input: Input,
