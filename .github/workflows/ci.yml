@@ -30,6 +30,9 @@ jobs:
       - name: Setup
         uses: ./tooling/github/setup
 
+      - name: Check dependencies
+        run: pnpm dependencies:check
+
       - name: Check (lint and format)
         run: pnpm check
 
