@@ -21,6 +21,7 @@ import { Maximize, Minimize, Minus, X } from "lucide-react";
 import React, { useEffect } from "react";
 import { useSystem } from "@/routes/-components/system/system-provider";
 import type { FileRoutesByTo } from "../../routeTree.gen";
+import { ApplicationLoadingFallback } from "./application-loading-fallback";
 import {
   registerApplicationRoute,
   useApplicationRoute,
@@ -35,7 +36,7 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
 
   return ({
     component: ApplicationComponent,
-    fallback: FallbackComponent,
+    fallback: FallbackComponent = ApplicationLoadingFallback,
     launcher: LauncherComponent,
     ...applicationFactoryDefinition
   }: RouteApplicationDefinition) => {
