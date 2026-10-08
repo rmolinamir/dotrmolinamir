@@ -35,7 +35,7 @@ export function Wallpaper(props: WallpaperProps) {
           vignetteRadius={vignetteRadius}
         >
           <Glitch intensity={0.1} speed={0.5}>
-            <Liquify intensity={0.8} decay={2.5} radius={1.5} edges="mirror">
+            <Liquify intensity={0.8} radius={1.5} edges="mirror">
               <FlowField strength={0.4} detail={1.2} speed={0.1} edges="mirror">
                 <LightThemeOnly>
                   <ImageTexture url={LIGHT_WALLPAPER} />
