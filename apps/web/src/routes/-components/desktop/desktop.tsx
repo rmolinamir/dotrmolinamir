@@ -58,8 +58,10 @@ export function Desktop({ className, children, ...props }: DesktopProps) {
       <Taskbar className="z-taskbar max-w-dvw shrink-0">
         <TaskbarSection className="h-full" align="start">
           <TaskbarStart />
-          <TaskbarGitHub />
-          <TaskbarLinkedIn />
+          <div className="hidden md:flex">
+            <TaskbarGitHub />
+            <TaskbarLinkedIn />
+          </div>
         </TaskbarSection>
         <TaskbarDivider />
         <TaskbarSection className="h-full items-center" align="center" grow>
@@ -67,7 +69,7 @@ export function Desktop({ className, children, ...props }: DesktopProps) {
         </TaskbarSection>
         <TaskbarDivider />
         <TaskbarSection className="h-full" align="end">
-          <ThemeMenu variant="ghost" />
+          <ThemeMenu variant="ghost" className="hidden md:inline-flex" />
           <ApplicationSidebarTrigger variant="ghost" />
           <TaskbarClock className="hidden px-2 py-1 text-xs md:flex" />
         </TaskbarSection>
