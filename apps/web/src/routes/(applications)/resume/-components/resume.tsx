@@ -10,7 +10,7 @@ export function Resume() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <article className="flex h-full min-h-0 flex-col gap-2 p-2 text-sm">
+    <article className="relative flex h-full min-h-0 flex-col gap-2 p-2 text-sm">
       <Button asChild variant="ghost" size="icon-xs" className="self-end">
         <a
           href={`${resumeUrl}/view`}
@@ -41,12 +41,12 @@ export function Resume() {
             </p>
           </div>
         )}
-        <SimulatedProgressBar
-          loadingCount={isLoaded ? 0 : 1}
-          aria-label="Loading resume viewer"
-          className="absolute inset-x-0 top-0"
-        />
       </div>
+      <SimulatedProgressBar
+        loadingCount={isLoaded ? 0 : 1}
+        aria-label="Loading resume viewer"
+        className="absolute inset-x-0 top-0 [&_[data-slot=progress-track]]:rounded-none"
+      />
     </article>
   );
 }
