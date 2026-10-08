@@ -1,5 +1,3 @@
-import { Button } from "@acme/ui/components/button";
-import { ExternalLink } from "lucide-react";
 import { useState } from "react";
 import { SimulatedProgressBar } from "../../../../components/simulated-progress-bar";
 
@@ -10,18 +8,7 @@ export function Resume() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   return (
-    <article className="relative flex h-full min-h-0 flex-col gap-2 p-2 text-sm">
-      <Button asChild variant="ghost" size="icon-xs" className="self-end">
-        <a
-          href={`${resumeUrl}/view`}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Open resume in a new tab"
-          title="Open resume in a new tab"
-        >
-          <ExternalLink aria-hidden="true" />
-        </a>
-      </Button>
+    <article className="relative flex h-full min-h-0 flex-col p-2 text-sm">
       <div className="relative min-h-0 flex-1" aria-busy={!isLoaded}>
         <iframe
           className="block h-full w-full"
