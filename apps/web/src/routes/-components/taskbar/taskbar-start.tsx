@@ -2,10 +2,13 @@ import { Button } from "@acme/ui/components/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@acme/ui/components/dropdown-menu";
+import { useTheme } from "@acme/ui/components/theme";
 import {
   Tooltip,
   TooltipContent,
@@ -14,13 +17,17 @@ import {
 import { cn } from "@acme/ui/lib/utils";
 import { TaskbarItem } from "@acme/ui/os/taskbar";
 import { useQuitApplications } from "@/hooks/use-quit-applications";
+import { GITHUB_URL, LINKEDIN_URL } from "@/lib/socials/constants";
 import { useSystem } from "../system/system-provider";
+import { GitHubIcon } from "./taskbar-github";
+import { LinkedInIcon } from "./taskbar-linkedin";
 
 type TaskbarLogoProps = React.ComponentPropsWithoutRef<"svg">;
 
 export function TaskbarStart({ className, ...props }: TaskbarLogoProps) {
   const { quitApplications } = useQuitApplications();
   const { shutdown } = useSystem();
+  const { setTheme } = useTheme();
 
   return (
     <Tooltip>
@@ -31,7 +38,7 @@ export function TaskbarStart({ className, ...props }: TaskbarLogoProps) {
               <TaskbarItem
                 className="text-accent hover:text-accent-foreground"
                 variant="icon"
-                onClick={quitApplications}
+                aria-label="Open start menu"
               >
                 <svg
                   className={cn("size-5", className)}
@@ -50,10 +57,48 @@ export function TaskbarStart({ className, ...props }: TaskbarLogoProps) {
             </Button>
           </DropdownMenuTrigger>
         </TooltipTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="start" side="top" className="min-w-48">
           <DropdownMenuLabel className="select-none text-foreground/55 text-xs">
             Start Menu
           </DropdownMenuLabel>
+          <DropdownMenuGroup className="md:hidden">
+            <DropdownMenuItem
+              render={
+                <a
+                  href={GITHUB_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              <GitHubIcon className="size-4" aria-hidden="true" />
+              GitHub
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              render={
+                <a
+                  href={LINKEDIN_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              <LinkedInIcon className="size-4" aria-hidden="true" />
+              LinkedIn
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Themes</DropdownMenuLabel>
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              System
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </DropdownMenuGroup>
           <DropdownMenuItem onClick={quitApplications}>
             Quit applications
           </DropdownMenuItem>

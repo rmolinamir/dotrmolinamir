@@ -31,12 +31,12 @@ import {
 import * as React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useNotFound } from "@/hooks/use-not-found";
-import { useQuitApplications } from "@/hooks/use-quit-applications";
 import { ApplicationSidebar } from "@/routes/-components/applications/application-sidebar";
 import {
   SystemProvider,
   useSystem,
 } from "@/routes/-components/system/system-provider";
+import { TaskbarStart } from "@/routes/-components/taskbar/taskbar-start";
 import { TaskbarTabStrip } from "@/routes/-components/taskbar/taskbar-tab-strip";
 import { ApplicationRoutingProvider } from "./application-routing";
 import { createApplicationRoute } from "./create-route-application";
@@ -81,7 +81,6 @@ function setup({
     const applications = useApplicationManager();
     const windows = useWindowManager();
     const system = useSystem();
-    const { quitApplications } = useQuitApplications();
     managers = { applications, system, windows };
     return (
       <>
@@ -95,9 +94,7 @@ function setup({
         <doom.Launcher />
         <TaskbarTabStrip />
         <ApplicationSidebar />
-        <button type="button" onClick={quitApplications}>
-          Quit
-        </button>
+        <TaskbarStart />
         <Outlet />
       </>
     );
@@ -704,12 +701,49 @@ describe("active-window routing", () => {
     await app.expectPath("/");
   });
 
+  it("keeps applications and their state when opening and dismissing Start", async () => {
+    const app = setup({ initialEntries: ["/about"] });
+    await app.expectPath("/about");
+    fireEvent.click(screen.getByText("Count 0"));
+    await app.navigate("/doom");
+    await app.expectPath("/doom");
+    const applicationIds = app.managers.applications.runningApplications.map(
+      (application) => application.id,
+    );
+    const location = app.router.state.location.href;
+
+    fireEvent.click(screen.getByRole("button", { name: "Open start menu" }));
+    const quitItem = await screen.findByRole("menuitem", {
+      name: "Quit applications",
+    });
+    expect(
+      app.managers.applications.runningApplications.map(
+        (application) => application.id,
+      ),
+    ).toEqual(applicationIds);
+    expect(app.router.state.location.href).toBe(location);
+    expect(screen.getByText("Count 1")).toBeTruthy();
+
+    fireEvent.keyDown(quitItem, { key: "Escape" });
+    await waitFor(() => expect(screen.queryByRole("menu")).toBeNull());
+    await app.expectPath("/doom");
+    expect(
+      app.managers.applications.runningApplications.map(
+        (application) => application.id,
+      ),
+    ).toEqual(applicationIds);
+    expect(screen.getByText("Count 1")).toBeTruthy();
+  });
+
   it("quits all applications without relaunching a closing window", async () => {
     const app = setup({ initialEntries: ["/about"] });
     await app.expectPath("/about");
     await app.navigate("/doom");
     await app.expectPath("/doom");
-    fireEvent.click(screen.getByText("Quit"));
+    fireEvent.click(screen.getByRole("button", { name: "Open start menu" }));
+    fireEvent.click(
+      await screen.findByRole("menuitem", { name: "Quit applications" }),
+    );
     await app.expectPath("/");
     expect(app.managers.applications.runningApplications).toHaveLength(0);
   });

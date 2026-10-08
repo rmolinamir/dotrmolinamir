@@ -3,7 +3,7 @@
 ## Next
 
 - Blog app (primary content surface). ([#70](https://github.com/rmolinamir/dotrmolinamir/issues/70))
-- Settings app with display options (theme, wallpaper, taskbar/dock). ([#71](https://github.com/rmolinamir/dotrmolinamir/issues/71))
+- Settings app with display options (theme, wallpaper, taskbar/dock), keeping theme choices accessible from the mobile Start menu. ([#71](https://github.com/rmolinamir/dotrmolinamir/issues/71))
 - Terminal app. ([#72](https://github.com/rmolinamir/dotrmolinamir/issues/72))
 
 ## Later / TBD
