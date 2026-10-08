@@ -1,6 +1,7 @@
 import { Button } from "@acme/ui/components/button";
-import { ExternalLink, LoaderCircle } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { SimulatedProgressBar } from "../../../../components/simulated-progress-bar";
 
 const resumeUrl =
   "https://drive.google.com/file/d/15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9";
@@ -34,16 +35,17 @@ export function Resume() {
           onLoad={() => setIsLoaded(true)}
         />
         {!isLoaded && (
-          <div className="absolute inset-0 grid touch-none place-items-center bg-background/90">
-            <div role="status">
-              <LoaderCircle
-                aria-hidden="true"
-                className="size-6 animate-spin"
-              />
-              <span className="sr-only">Loading resume viewer…</span>
-            </div>
+          <div className="absolute inset-0 touch-none bg-background/90">
+            <p role="status" className="sr-only">
+              Loading resume viewer…
+            </p>
           </div>
         )}
+        <SimulatedProgressBar
+          loadingCount={isLoaded ? 0 : 1}
+          aria-label="Loading resume viewer"
+          className="absolute inset-x-0 top-0"
+        />
       </div>
     </article>
   );
