@@ -61,7 +61,7 @@ export function TaskbarStart({ className, ...props }: TaskbarLogoProps) {
           <DropdownMenuLabel className="select-none text-foreground/55 text-xs">
             Start Menu
           </DropdownMenuLabel>
-          <DropdownMenuGroup className="md:hidden">
+          <DropdownMenuGroup>
             <DropdownMenuItem
               render={
                 <a
