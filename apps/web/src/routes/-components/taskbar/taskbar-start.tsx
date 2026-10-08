@@ -18,9 +18,9 @@ import { cn } from "@acme/ui/lib/utils";
 import { TaskbarItem } from "@acme/ui/os/taskbar";
 import { useQuitApplications } from "@/hooks/use-quit-applications";
 import { GITHUB_URL, LINKEDIN_URL } from "@/lib/socials/constants";
+import { GitHubIcon } from "../../../components/icons/github";
+import { LinkedInIcon } from "../../../components/icons/linkedin";
 import { useSystem } from "../system/system-provider";
-import { GitHubIcon } from "./taskbar-github";
-import { LinkedInIcon } from "./taskbar-linkedin";
 
 type TaskbarLogoProps = React.ComponentPropsWithoutRef<"svg">;
 
