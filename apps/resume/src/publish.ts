@@ -8,20 +8,11 @@ import { auth, drive, type drive_v3 } from "@googleapis/drive";
 interface PublishOptions {
   pdf: Buffer<ArrayBuffer>;
   fileId: string | undefined;
-  clientId: string | undefined;
-  clientSecret: string | undefined;
-  refreshToken: string | undefined;
 }
 
 interface PublishResult {
   fileId: string;
   changed: boolean;
-}
-
-interface Credentials {
-  clientId: string;
-  clientSecret: string;
-  refreshToken: string;
 }
 
 interface DriveFiles {
@@ -33,16 +24,14 @@ interface DriveFiles {
   ): Promise<drive_v3.Schema$File>;
 }
 
-type CreateDriveFiles = (credentials: Credentials) => DriveFiles;
+type CreateDriveFiles = () => DriveFiles;
 
-function createDriveFiles({
-  clientId,
-  clientSecret,
-  refreshToken,
-}: Credentials): DriveFiles {
-  const oauth = new auth.OAuth2({ clientId, clientSecret });
-  oauth.setCredentials({ refresh_token: refreshToken });
-  const client = drive({ auth: oauth, version: "v3" });
+function createDriveFiles(): DriveFiles {
+  // The auth action supplies federated Application Default Credentials in CI.
+  const credentials = new auth.GoogleAuth({
+    scopes: ["https://www.googleapis.com/auth/drive"],
+  });
+  const client = drive({ auth: credentials, version: "v3" });
   return {
     get: async (params) =>
       (await client.files.get(params, { timeout: 30_000 })).data,
@@ -65,24 +54,16 @@ function requestFailure(operation: string, error: unknown): Error {
 
 // Read the environment at the CLI boundary. Never log credentials or token responses.
 export async function publishResume(
-  { pdf, fileId, clientId, clientSecret, refreshToken }: PublishOptions,
+  { pdf, fileId }: PublishOptions,
   createFiles: CreateDriveFiles = createDriveFiles,
 ): Promise<PublishResult> {
-  if (
-    !fileId ||
-    !/^[\w-]+$/.test(fileId) ||
-    !clientId ||
-    !clientSecret ||
-    !refreshToken
-  ) {
-    throw new Error(
-      "Set GOOGLE_DRIVE_FILE_ID and all three GOOGLE_DRIVE_OAUTH_* secrets.",
-    );
+  if (!fileId || !/^[\w-]+$/.test(fileId)) {
+    throw new Error("Set GOOGLE_DRIVE_FILE_ID to the existing PDF file ID.");
   }
   if (pdf.subarray(0, 5).toString() !== "%PDF-") {
     throw new Error("The upload must be a PDF.");
   }
-  const files = createFiles({ clientId, clientSecret, refreshToken });
+  const files = createFiles();
   let current: drive_v3.Schema$File;
   try {
     current = await files.get({
@@ -128,11 +109,9 @@ export async function publishResume(
 if (import.meta.main) {
   try {
     // process.env is confined to this executable entry point.
-    // biome-ignore lint/style/noProcessEnv: CI supplies OAuth credentials through environment variables.
+    // biome-ignore lint/style/noProcessEnv: Read the target file ID at the CLI boundary.
     const env = process.env;
     const result = await publishResume({
-      clientId: env.GOOGLE_DRIVE_OAUTH_CLIENT_ID,
-      clientSecret: env.GOOGLE_DRIVE_OAUTH_CLIENT_SECRET,
       fileId: env.GOOGLE_DRIVE_FILE_ID,
       pdf: await readFile(
         process.argv[2]
@@ -142,7 +121,6 @@ if (import.meta.main) {
               "../generated/robert-molina-resume.pdf",
             ),
       ),
-      refreshToken: env.GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN,
     });
     console.info(
       result.changed

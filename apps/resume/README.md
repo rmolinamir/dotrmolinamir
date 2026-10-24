@@ -33,7 +33,7 @@ pnpm --filter @acme/resume typecheck
 ```
 
 Inside this app, use `pnpm docx`, `pnpm pdf`, `pnpm test`, or `pnpm publish:drive`.
-The publish command requires the Google environment variables described below.
+The publish command requires Google Application Default Credentials and the file ID described below.
 It uploads the most recently generated PDF, so run `pnpm pdf` first when publishing
 locally. CI always generates the PDF before publishing it.
 
@@ -83,8 +83,7 @@ previews as well as local previews when changing layout.
 The Resume workflow generates Word, PDF, and preview artifacts when resume files
 or the workflow change on `main`. These pushes also replace the existing Drive PDF.
 Manual runs publish only from `main`. The workflow does not run on pull requests
-or commit generated files back to Git. The
-versioned sources are the TypeScript content, Zod schema, and DOCX template.
+or commit generated files back to Git. The versioned sources are the TypeScript content, Zod schema, and DOCX template.
 
 The template embeds the original Garamond fonts. Preview CI artifacts after font
 or spacing changes. To refresh the image and its installed packages, run this
@@ -96,52 +95,130 @@ docker build --pull --no-cache -t acme-resume-pdf:local apps/resume/docker
 
 ## One-time Google Drive setup
 
-The website currently embeds this existing PDF:
+The publisher authenticates as a service account through GitHub Workload Identity
+Federation. GitHub exchanges its identity for short-lived Google credentials.
+No OAuth consent-screen publishing, policy pages, refresh tokens, or downloaded
+service-account keys are required. The official `@googleapis/drive` SDK reads the
+credentials through Application Default Credentials and requests the Drive scope.
+
+The website embeds this existing PDF:
 https://drive.google.com/file/d/15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9/view
 
-The publisher uses Google's official `@googleapis/drive` Node.js SDK. Its OAuth
-client refreshes access tokens, and the typed `files.get` and `files.update`
-methods inspect and replace the PDF using that file ID.
-It changes file contents without creating a new file or changing sharing
-permissions. Links to that Drive file remain valid. LinkedIn links to the same
-Drive URL continue to work. A PDF uploaded directly to LinkedIn is a separate
-copy and still needs its own update.
+The publisher replaces that file's contents without creating a new file or changing
+sharing permissions. Its Drive URL remains valid. A PDF uploaded directly to
+LinkedIn is a separate copy and still needs its own update.
 
-1. Create or choose a Google Cloud project and enable the Google Drive API.
-2. Configure Google Auth Platform for your own account. For persistent automation,
-   use the production publishing state. External apps in Testing normally receive
-   refresh tokens that expire after seven days for Drive scopes.
-3. Create an OAuth client of type Web application. Add this authorized redirect
-   URI: `https://developers.google.com/oauthplayground`.
-4. Open Google's OAuth Playground. In its settings, enable **Use your own OAuth
-   credentials** and enter the client ID and client secret privately.
-5. Authorize `https://www.googleapis.com/auth/drive` as the account that owns or
-   can edit the existing PDF. Exchange the authorization code for tokens. Use
-   offline access to obtain a refresh token. This scope permits access to Drive
-   files beyond the resume, so keep the credentials in GitHub secrets. The narrower
-   `drive.file` scope requires an explicit app file-selection flow for this
-   pre-existing file, which this publisher does not implement.
-6. Create the GitHub Actions environment `resume-drive`. Restrict deployment
-   branches to `main`. Add these environment secrets:
-   - `GOOGLE_DRIVE_OAUTH_CLIENT_ID`
-   - `GOOGLE_DRIVE_OAUTH_CLIENT_SECRET`
-   - `GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN`
-7. Optionally set the environment variable `GOOGLE_DRIVE_FILE_ID` to override the
-   current file ID. Keep the existing ID to preserve current links.
-8. Merge the content, template, and workflow changes into `main`, or run the Resume workflow
-   manually on `main`. Inspect its artifact and confirm the existing Drive link.
+### 1. Create the service account and share the PDF
 
-Enter credentials directly in Google and GitHub. Do not put them in source
-files, commit them, or paste them into chat. Refresh tokens can be revoked or
-expire. If authorization fails, authorize again and replace the GitHub secret.
+In the Google Cloud project with the Drive API enabled, open **IAM & Admin →
+Service Accounts → Create service account**. Use `resume-publisher` as the ID.
+Skip project roles and optional user access. If you already created this service
+account, keep it.
 
-The publisher checks the target's MIME type and edit permission before upload,
-skips byte-identical files, and checks Drive's returned ID and MD5 checksum.
-A missing or inaccessible target fails the run. It never creates a replacement
-file with a different link.
+Open the existing PDF in Drive and share it with the service-account email as
+**Editor**. Keep yourself as the owner. The account needs access to this existing
+file, not project-wide Editor access or domain-wide delegation.
+
+### 2. Connect GitHub to the service account
+
+Open Google Cloud Shell in that project. Replace `YOUR_PROJECT_ID` below. If the
+service account has a different ID, adjust `RESUME_SERVICE_ACCOUNT` too.
+Run these commands once. If a pool or provider with these IDs already exists,
+inspect its configuration instead of creating a duplicate.
+
+```sh
+RESUME_PROJECT_ID='YOUR_PROJECT_ID'
+RESUME_SERVICE_ACCOUNT="resume-publisher@${RESUME_PROJECT_ID}.iam.gserviceaccount.com"
+RESUME_PROJECT_NUMBER="$(gcloud projects describe "$RESUME_PROJECT_ID" --format='value(projectNumber)')"
+
+gcloud services enable drive.googleapis.com iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
+  --project="$RESUME_PROJECT_ID"
+
+gcloud iam workload-identity-pools create resume-github \
+  --project="$RESUME_PROJECT_ID" \
+  --location=global \
+  --display-name='Resume GitHub Actions'
+
+gcloud iam workload-identity-pools providers create-oidc resume-publisher \
+  --project="$RESUME_PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool=resume-github \
+  --issuer-uri='https://token.actions.githubusercontent.com' \
+  --attribute-mapping='google.subject=assertion.sub,attribute.repository_id=assertion.repository_id,attribute.repository_owner_id=assertion.repository_owner_id,attribute.ref=assertion.ref' \
+  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-drive' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume.yml@refs/heads/main'"
+
+gcloud iam service-accounts add-iam-policy-binding "$RESUME_SERVICE_ACCOUNT" \
+  --project="$RESUME_PROJECT_ID" \
+  --role=roles/iam.workloadIdentityUser \
+  --member="principalSet://iam.googleapis.com/projects/${RESUME_PROJECT_NUMBER}/locations/global/workloadIdentityPools/resume-github/attribute.repository_id/156124858"
+
+gcloud iam workload-identity-pools providers describe resume-publisher \
+  --project="$RESUME_PROJECT_ID" \
+  --location=global \
+  --workload-identity-pool=resume-github \
+  --format='value(name)'
+```
+
+The provider condition restricts authentication to this repository's numeric ID,
+its owner ID, the `main` branch, the `resume-drive` environment, and this workflow.
+The final command prints the provider resource name for the next step. IAM changes
+can take several minutes to propagate.
+
+### 3. Configure GitHub
+
+In repository **Settings → Environments**, create or open `resume-drive`.
+Restrict deployment branches to `main`. Add these **environment variables**, not
+secrets:
+
+| Variable | Value |
+| --- | --- |
+| `GOOGLE_WORKLOAD_IDENTITY_PROVIDER` | The full provider name printed above: `projects/NUMBER/locations/global/workloadIdentityPools/resume-github/providers/resume-publisher` |
+| `GOOGLE_SERVICE_ACCOUNT` | `resume-publisher@YOUR_PROJECT_ID.iam.gserviceaccount.com` |
+| `GOOGLE_DRIVE_FILE_ID` | Optional. Defaults to `15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9`. Keep this ID to preserve existing links. |
+
+No Google credential secrets are needed. The publish job alone has `id-token:
+write`. It uses `google-github-actions/auth` after dependency installation and
+artifact download, then runs the SDK with the temporary credentials. The auth
+action removes its credentials file at job completion. The root `.gitignore`
+excludes these temporary files too.
+
+### 4. Run and check
+
+Configure Google and GitHub before merging the resume workflow into `main`.
+The merge triggers generation and publishing. If the workflow is already on
+`main`, use **Actions → Update Resume → Run workflow → main**.
+
+Inspect the build artifact and confirm the updated PDF through the existing Drive
+link. Both jobs must succeed. The publisher checks the target's MIME type and edit
+permission, skips identical PDF bytes, and checks the returned file ID and MD5
+checksum. It fails rather than creating a file with a different link.
+
+Live federation and Drive access must be checked with a configured workflow run;
+local unit tests do not establish that the cloud permissions are correct.
+
+### Local publishing and troubleshooting
+
+Local document generation does not need Google credentials. To publish locally,
+use a federated Application Default Credentials configuration for the service
+account, point `GOOGLE_APPLICATION_CREDENTIALS` to that configuration, and set
+`GOOGLE_DRIVE_FILE_ID`. Run `pnpm pdf` before `pnpm publish:drive`. The GitHub
+credential file is temporary and is not intended for reuse outside its job.
+
+If federation fails, check the provider resource name, service-account binding,
+repository IDs, branch, environment, and workflow path against the commands above.
+If Drive access fails, confirm the API is enabled and the service-account email
+has Editor access to the existing PDF. Do not create a new PDF to resolve an error.
+
+### Remove the abandoned OAuth setup
+
+If you followed the earlier OAuth instructions, delete only the unused resume
+OAuth client, revoke any personal-account grant to that client, and delete its
+three `GOOGLE_DRIVE_OAUTH_*` GitHub secrets. Keep the Cloud project, Drive API,
+service account, GitHub environment, and existing PDF. Saved Branding settings
+are not used by this workflow and do not need further configuration.
 
 References:
+- [Google: create service-account credentials and share files](https://developers.google.com/workspace/guides/create-credentials)
+- [Google: federation for deployment pipelines](https://cloud.google.com/iam/docs/workload-identity-federation-with-deployment-pipelines)
+- [Google GitHub authentication action](https://github.com/google-github-actions/auth)
 - [Drive file uploads and updates](https://developers.google.com/workspace/drive/api/guides/manage-uploads)
-- [OAuth offline access and refresh tokens](https://developers.google.com/identity/protocols/oauth2/web-server)
-- [OAuth token expiration rules](https://developers.google.com/identity/protocols/oauth2/)
-- [OAuth Playground](https://developers.google.com/oauthplayground/)

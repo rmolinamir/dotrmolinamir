@@ -48,6 +48,9 @@ jobs:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment: resume-drive
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -60,10 +63,15 @@ jobs:
         with:
           name: resume
           path: apps/resume/generated/
-      - name: Replace existing Google Drive PDF
+      - name: Authenticate as the resume service account
+        # Authentication runs after dependency installation and artifact download.
+        # The SDK requests the Drive scope using the generated credentials file.
+        # No OAuth client secret, refresh token, or service-account key is stored.
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GOOGLE_SERVICE_ACCOUNT }}
+      - name: Publish existing PDF
         env:
           GOOGLE_DRIVE_FILE_ID: ${{ vars.GOOGLE_DRIVE_FILE_ID || '15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9' }}
-          GOOGLE_DRIVE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_DRIVE_OAUTH_CLIENT_ID }}
-          GOOGLE_DRIVE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_DRIVE_OAUTH_CLIENT_SECRET }}
-          GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN: ${{ secrets.GOOGLE_DRIVE_OAUTH_REFRESH_TOKEN }}
         run: node src/publish.ts

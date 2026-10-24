@@ -8,11 +8,8 @@ import { publishResume } from "./publish.ts";
 const pdf = Buffer.from("%PDF-1.7\nexample");
 const checksum = createHash("md5").update(pdf).digest("hex");
 const config = {
-  clientId: "client",
-  clientSecret: "secret",
   fileId: "existing-file",
   pdf,
-  refreshToken: "refresh",
 };
 const metadata: drive_v3.Schema$File = {
   capabilities: { canEdit: true },
@@ -27,16 +24,7 @@ function mockFiles(
   const gets: drive_v3.Params$Resource$Files$Get[] = [];
   const updates: drive_v3.Params$Resource$Files$Update[] = [];
   return {
-    create: (credentials: {
-      clientId: string;
-      clientSecret: string;
-      refreshToken: string;
-    }) => {
-      assert.deepEqual(credentials, {
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
-        refreshToken: config.refreshToken,
-      });
+    create: () => {
       return {
         get: async (params: drive_v3.Params$Resource$Files$Get) => {
           gets.push(params);
@@ -98,8 +86,8 @@ for (const replacement of [
 
 test("stops on SDK authorization failures without exposing request credentials", async () => {
   const mock = mockFiles();
-  const create: Parameters<typeof publishResume>[1] = (credentials) => ({
-    ...mock.create(credentials),
+  const create: Parameters<typeof publishResume>[1] = () => ({
+    ...mock.create(),
     get: async () => {
       throw { code: 401, message: "private token details" };
     },
@@ -110,14 +98,16 @@ test("stops on SDK authorization failures without exposing request credentials",
   assert.equal(mock.updates.length, 0);
 });
 
-test("rejects missing credentials and non-PDF input before creating an SDK client", async () => {
+test("rejects invalid file IDs and non-PDF input before creating an SDK client", async () => {
   const create = () => {
     assert.fail("Should not create the SDK client");
   };
-  await assert.rejects(
-    publishResume({ ...config, refreshToken: "" }, create),
-    /Set GOOGLE_DRIVE/,
-  );
+  for (const fileId of [undefined, "", "invalid/file"]) {
+    await assert.rejects(
+      publishResume({ ...config, fileId }, create),
+      /Set GOOGLE_DRIVE/,
+    );
+  }
   await assert.rejects(
     publishResume({ ...config, pdf: Buffer.from("not a PDF") }, create),
     /must be a PDF/,
@@ -126,8 +116,8 @@ test("rejects missing credentials and non-PDF input before creating an SDK clien
 
 test("reports SDK upload failures without exposing request credentials", async () => {
   const mock = mockFiles();
-  const create: Parameters<typeof publishResume>[1] = (credentials) => ({
-    ...mock.create(credentials),
+  const create: Parameters<typeof publishResume>[1] = () => ({
+    ...mock.create(),
     update: async () => {
       throw { code: 403, message: "private request details" };
     },
