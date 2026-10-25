@@ -184,24 +184,6 @@ artifact download, then runs the SDK with the temporary credentials. The auth
 action removes its credentials file at job completion. The root `.gitignore`
 excludes these temporary files too.
 
-### Existing installation: update the workflow trust
-
-The workflow is now `.github/workflows/resume-cms.yml`. If you configured Google
-before this rename, run the following in Cloud Shell before merging the rename.
-This updates the existing provider without recreating the pool or service account.
-The GitHub environment and variable values stay the same.
-
-```sh
-gcloud iam workload-identity-pools providers update-oidc resume-cms \
-  --project=dotrmolinamir \
-  --location=global \
-  --workload-identity-pool=resume-cms \
-  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-cms' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume-cms.yml@refs/heads/main'"
-```
-
-After this update, Google accepts the renamed workflow path. New installations
-already use that path in the provider creation command above.
-
 ### 4. Run and check
 
 Configure Google and GitHub before merging the resume workflow into `main`.
@@ -228,14 +210,6 @@ If federation fails, check the provider resource name, service-account binding,
 repository IDs, branch, environment, and workflow path against the commands above.
 If Drive access fails, confirm the API is enabled and the service-account email
 has Editor access to the existing PDF. Do not create a new PDF to resolve an error.
-
-### Remove the abandoned OAuth setup
-
-If you followed the earlier OAuth instructions, delete only the unused resume
-OAuth client, revoke any personal-account grant to that client, and delete its
-three `GOOGLE_DRIVE_OAUTH_*` GitHub secrets. Keep the Cloud project, Drive API,
-service account, GitHub environment, and existing PDF. Saved Branding settings
-are not used by this workflow and do not need further configuration.
 
 References:
 - [Google: create service-account credentials and share files](https://developers.google.com/workspace/guides/create-credentials)
