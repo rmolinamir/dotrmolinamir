@@ -146,7 +146,7 @@ gcloud iam workload-identity-pools providers create-oidc resume-publisher \
   --workload-identity-pool=resume-cms-github \
   --issuer-uri='https://token.actions.githubusercontent.com' \
   --attribute-mapping='google.subject=assertion.sub,attribute.repository_id=assertion.repository_id,attribute.repository_owner_id=assertion.repository_owner_id,attribute.ref=assertion.ref' \
-  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-drive' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume.yml@refs/heads/main'"
+  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-cms' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume.yml@refs/heads/main'"
 
 gcloud iam service-accounts add-iam-policy-binding "$RESUME_SERVICE_ACCOUNT" \
   --project="$RESUME_PROJECT_ID" \
@@ -161,13 +161,13 @@ gcloud iam workload-identity-pools providers describe resume-publisher \
 ```
 
 The provider condition restricts authentication to this repository's numeric ID,
-its owner ID, the `main` branch, the `resume-drive` environment, and this workflow.
+its owner ID, the `main` branch, the `resume-cms` environment, and this workflow.
 The final command prints the provider resource name for the next step. IAM changes
 can take several minutes to propagate.
 
 ### 3. Configure GitHub
 
-In repository **Settings → Environments**, create or open `resume-drive`.
+In repository **Settings → Environments**, create or open `resume-cms`.
 Restrict deployment branches to `main`. Add these **environment variables**, not
 secrets:
 

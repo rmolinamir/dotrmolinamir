@@ -47,7 +47,7 @@ jobs:
     needs: build
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
-    environment: resume-drive
+    environment: resume-cms
     permissions:
       contents: read
       id-token: write
