@@ -7,7 +7,7 @@ import { verifyResume } from "./verify.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const output = resolve(root, process.argv[2] ?? "generated");
-const image = "acme-resume-pdf:local";
+const image = "acme-resume-cms-pdf:local";
 
 try {
   execFileSync("docker", ["info", "--format", "{{.ServerVersion}}"], {
@@ -16,7 +16,7 @@ try {
   });
 } catch {
   throw new Error(
-    "PDF generation requires Docker to be installed and running. Start Docker and retry. To generate only Word, run pnpm --filter @acme/resume docx.",
+    "PDF generation requires Docker to be installed and running. Start Docker and retry. To generate only Word, run pnpm --filter @acme/resume-cms docx.",
   );
 }
 

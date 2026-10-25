@@ -7,7 +7,7 @@ Purpose
 
 Repo layout
 - `apps/frontend-practice`: Interview-style React exercises and tests.
-- `apps/resume`: Resume documents, PDF generation, and Google Drive publishing.
+- `apps/resume-cms`: Resume documents, PDF generation, and Google Drive publishing.
 - `apps/storybook`: Storybook for UI demos.
 - `apps/web`: TanStack Start app (Vite + Nitro).
 - `packages/ui`: UI components and OS windowing primitives.
@@ -16,7 +16,7 @@ Repo layout
 
 Command sources
 - Root scripts: `package.json`.
-- Package scripts: `apps/resume/package.json`, `apps/web/package.json`, `apps/storybook/package.json`, `packages/ui/package.json`.
+- Package scripts: `apps/resume-cms/package.json`, `apps/web/package.json`, `apps/storybook/package.json`, `packages/ui/package.json`.
 - CI setup steps: `tooling/github/setup/action.yml`.
 - Workspace layout: `pnpm-workspace.yaml`.
 - Package manager behavior: `.npmrc`.

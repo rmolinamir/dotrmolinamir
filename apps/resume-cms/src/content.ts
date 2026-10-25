@@ -1,6 +1,6 @@
 import type { ResumeInput } from "./schema.ts";
 
-// Edit this content, then run pnpm --filter @acme/resume pdf.
+// Edit this content, then run pnpm --filter @acme/resume-cms pdf.
 export default {
   name: "Robert Molina",
   target: "STAFF FULL-STACK SOFTWARE ENGINEER",

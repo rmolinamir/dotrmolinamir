@@ -23,13 +23,13 @@ From the repository root:
 
 ```sh
 # Generate an editable Word file without LibreOffice or Poppler.
-pnpm --filter @acme/resume docx
+pnpm --filter @acme/resume-cms docx
 
 # Generate Word, PDF, and page previews.
-pnpm --filter @acme/resume pdf
+pnpm --filter @acme/resume-cms pdf
 
-pnpm --filter @acme/resume test
-pnpm --filter @acme/resume typecheck
+pnpm --filter @acme/resume-cms test
+pnpm --filter @acme/resume-cms typecheck
 ```
 
 Inside this app, use `pnpm docx`, `pnpm pdf`, `pnpm test`, or `pnpm publish:drive`.
@@ -65,7 +65,7 @@ and fallback fonts are installed inside `docker/Dockerfile`; you do not need the
 on your host. DOCX generation, tests, and type checking require only Node and the
 workspace dependencies.
 
-`pnpm pdf` builds the `acme-resume-pdf:local` tools image, generates the DOCX, and
+`pnpm pdf` builds the `acme-resume-cms-pdf:local` tools image, generates the DOCX, and
 runs conversion, PDF checks, and preview rendering in containers. Docker caches
 the image after the first build. Content edits do not change the image. The first
 build needs network access to download the base image and packages; conversion
@@ -80,7 +80,7 @@ from the same Dockerfile instead of installing PDF tools on the runner itself.
 The image follows the Docker engine's default CPU architecture, so inspect CI
 previews as well as local previews when changing layout.
 
-The Resume workflow generates Word, PDF, and preview artifacts when resume files
+The Resume CMS workflow generates Word, PDF, and preview artifacts when resume files
 or the workflow change on `main`. These pushes also replace the existing Drive PDF.
 Manual runs publish only from `main`. The workflow does not run on pull requests
 or commit generated files back to Git. The versioned sources are the TypeScript content, Zod schema, and DOCX template.
@@ -90,7 +90,7 @@ or spacing changes. To refresh the image and its installed packages, run this
 from the repository root:
 
 ```sh
-docker build --pull --no-cache -t acme-resume-pdf:local apps/resume/docker
+docker build --pull --no-cache -t acme-resume-cms-pdf:local apps/resume-cms/docker
 ```
 
 ## One-time Google Drive setup
@@ -147,7 +147,7 @@ gcloud iam workload-identity-pools providers create-oidc resume-cms \
   --workload-identity-pool=resume-cms \
   --issuer-uri='https://token.actions.githubusercontent.com' \
   --attribute-mapping='google.subject=assertion.sub,attribute.repository_id=assertion.repository_id,attribute.repository_owner_id=assertion.repository_owner_id,attribute.ref=assertion.ref' \
-  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-cms' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume.yml@refs/heads/main'"
+  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-cms' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume-cms.yml@refs/heads/main'"
 
 gcloud iam service-accounts add-iam-policy-binding "$RESUME_SERVICE_ACCOUNT" \
   --project="$RESUME_PROJECT_ID" \
@@ -184,11 +184,29 @@ artifact download, then runs the SDK with the temporary credentials. The auth
 action removes its credentials file at job completion. The root `.gitignore`
 excludes these temporary files too.
 
+### Existing installation: update the workflow trust
+
+The workflow is now `.github/workflows/resume-cms.yml`. If you configured Google
+before this rename, run the following in Cloud Shell before merging the rename.
+This updates the existing provider without recreating the pool or service account.
+The GitHub environment and variable values stay the same.
+
+```sh
+gcloud iam workload-identity-pools providers update-oidc resume-cms \
+  --project=dotrmolinamir \
+  --location=global \
+  --workload-identity-pool=resume-cms \
+  --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-cms' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume-cms.yml@refs/heads/main'"
+```
+
+After this update, Google accepts the renamed workflow path. New installations
+already use that path in the provider creation command above.
+
 ### 4. Run and check
 
 Configure Google and GitHub before merging the resume workflow into `main`.
 The merge triggers generation and publishing. If the workflow is already on
-`main`, use **Actions → Update Resume → Run workflow → main**.
+`main`, use **Actions → Update Resume CMS → Run workflow → main**.
 
 Inspect the build artifact and confirm the updated PDF through the existing Drive
 link. Both jobs must succeed. The publisher checks the target's MIME type and edit
