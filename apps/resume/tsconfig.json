@@ -1,0 +1,11 @@
+{
+  "extends": "@acme/tsconfig/tsconfig.nodejs.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true
+  },
+  "include": ["src/**/*.ts"]
+}

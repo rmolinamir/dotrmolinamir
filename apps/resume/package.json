@@ -1,0 +1,25 @@
+{
+  "name": "@acme/resume",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "pdf": "node src/convert.ts",
+    "publish:drive": "node src/publish.ts",
+    "test": "node --test src/*.test.ts",
+    "check": "biome check",
+    "typecheck": "tsc --noEmit",
+    "docx": "node src/generate.ts"
+  },
+  "devDependencies": {
+    "@acme/tsconfig": "workspace:*",
+    "@types/node": "^26.6.5",
+    "typescript": "~7.0.2"
+  },
+  "dependencies": {
+    "@googleapis/drive": "^27.0.0",
+    "fast-xml-parser": "^5.11.2",
+    "fflate": "^0.8.3",
+    "zod": "^4.6.7"
+  }
+}

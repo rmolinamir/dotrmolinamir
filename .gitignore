@@ -47,3 +47,6 @@ tsconfig.tsbuildinfo
 # mastra
 .mastra
 mastra.db*
+
+# Temporary credentials created by google-github-actions/auth.
+gha-creds-*.json
