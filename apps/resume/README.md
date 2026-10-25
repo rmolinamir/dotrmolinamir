@@ -1,4 +1,4 @@
-# Resume
+# Resume CMS
 
 Edit `src/content.ts` to change the resume. It exports a typed object containing the
 name, contact details, summary, experience, skills, and education. The `satisfies ResumeInput` annotation provides autocomplete and
@@ -111,7 +111,8 @@ LinkedIn is a separate copy and still needs its own update.
 ### 1. Create the service account and share the PDF
 
 In the Google Cloud project with the Drive API enabled, open **IAM & Admin →
-Service Accounts → Create service account**. Use `resume-publisher` as the ID.
+Service Accounts → Create service account**. Use **Resume CMS** as the display
+name and `resume-publisher` as the ID.
 Skip project roles and optional user access. If you already created this service
 account, keep it.
 
@@ -121,28 +122,28 @@ file, not project-wide Editor access or domain-wide delegation.
 
 ### 2. Connect GitHub to the service account
 
-Open Google Cloud Shell in that project. Replace `YOUR_PROJECT_ID` below. If the
-service account has a different ID, adjust `RESUME_SERVICE_ACCOUNT` too.
+Open Google Cloud Shell in the `dotrmolinamir` project. If the service account
+has a different ID, adjust `RESUME_SERVICE_ACCOUNT` below.
 Run these commands once. If a pool or provider with these IDs already exists,
 inspect its configuration instead of creating a duplicate.
 
 ```sh
-RESUME_PROJECT_ID='YOUR_PROJECT_ID'
+RESUME_PROJECT_ID='dotrmolinamir'
 RESUME_SERVICE_ACCOUNT="resume-publisher@${RESUME_PROJECT_ID}.iam.gserviceaccount.com"
 RESUME_PROJECT_NUMBER="$(gcloud projects describe "$RESUME_PROJECT_ID" --format='value(projectNumber)')"
 
-gcloud services enable drive.googleapis.com iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
+gcloud services enable drive.googleapis.com iam.googleapis.com cloudresourcemanager.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
   --project="$RESUME_PROJECT_ID"
 
-gcloud iam workload-identity-pools create resume-github \
+gcloud iam workload-identity-pools create resume-cms-github \
   --project="$RESUME_PROJECT_ID" \
   --location=global \
-  --display-name='Resume GitHub Actions'
+  --display-name='Resume CMS GitHub Actions'
 
 gcloud iam workload-identity-pools providers create-oidc resume-publisher \
   --project="$RESUME_PROJECT_ID" \
   --location=global \
-  --workload-identity-pool=resume-github \
+  --workload-identity-pool=resume-cms-github \
   --issuer-uri='https://token.actions.githubusercontent.com' \
   --attribute-mapping='google.subject=assertion.sub,attribute.repository_id=assertion.repository_id,attribute.repository_owner_id=assertion.repository_owner_id,attribute.ref=assertion.ref' \
   --attribute-condition="assertion.repository_id == '156124858' && assertion.repository_owner_id == '40744756' && assertion.ref == 'refs/heads/main' && assertion.sub == 'repo:rmolinamir/dotrmolinamir:environment:resume-drive' && assertion.workflow_ref == 'rmolinamir/dotrmolinamir/.github/workflows/resume.yml@refs/heads/main'"
@@ -150,12 +151,12 @@ gcloud iam workload-identity-pools providers create-oidc resume-publisher \
 gcloud iam service-accounts add-iam-policy-binding "$RESUME_SERVICE_ACCOUNT" \
   --project="$RESUME_PROJECT_ID" \
   --role=roles/iam.workloadIdentityUser \
-  --member="principalSet://iam.googleapis.com/projects/${RESUME_PROJECT_NUMBER}/locations/global/workloadIdentityPools/resume-github/attribute.repository_id/156124858"
+  --member="principalSet://iam.googleapis.com/projects/${RESUME_PROJECT_NUMBER}/locations/global/workloadIdentityPools/resume-cms-github/attribute.repository_id/156124858"
 
 gcloud iam workload-identity-pools providers describe resume-publisher \
   --project="$RESUME_PROJECT_ID" \
   --location=global \
-  --workload-identity-pool=resume-github \
+  --workload-identity-pool=resume-cms-github \
   --format='value(name)'
 ```
 
@@ -172,8 +173,8 @@ secrets:
 
 | Variable | Value |
 | --- | --- |
-| `GOOGLE_WORKLOAD_IDENTITY_PROVIDER` | The full provider name printed above: `projects/NUMBER/locations/global/workloadIdentityPools/resume-github/providers/resume-publisher` |
-| `GOOGLE_SERVICE_ACCOUNT` | `resume-publisher@YOUR_PROJECT_ID.iam.gserviceaccount.com` |
+| `GOOGLE_WORKLOAD_IDENTITY_PROVIDER` | The full provider name printed above: `projects/NUMBER/locations/global/workloadIdentityPools/resume-cms-github/providers/resume-publisher` |
+| `GOOGLE_SERVICE_ACCOUNT` | The existing service-account email, for example `resume-publisher@dotrmolinamir.iam.gserviceaccount.com` |
 | `GOOGLE_DRIVE_FILE_ID` | Optional. Defaults to `15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9`. Keep this ID to preserve existing links. |
 
 No Google credential secrets are needed. The publish job alone has `id-token:
