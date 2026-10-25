@@ -1,6 +1,6 @@
 import type { ResumeInput } from "./schema.ts";
 
-// Edit this content, then run pnpm --filter @acme/resume pdf.
+// Edit this content, then run pnpm --filter @acme/resume-cms pdf.
 export default {
   name: "Robert Molina",
   target: "STAFF FULL-STACK SOFTWARE ENGINEER",
@@ -19,10 +19,10 @@ export default {
       dates: "Feb 2025 - Present",
       bullets: [
         "Shipped new checkout experiences across frontend and Node.js/GraphQL services. Single-click Pay in 4 generated $23M annualized incremental total payment volume (TPV) and lifted checkout conversion 11\u00a0basis\u00a0points. Cashback-card recommendations represented approximately\u00a0$14M annualized TPV.",
+        "Designed and built an analytics framework adopted across multiple PayPal applications, requiring explicit event definitions. Automatically generated self-service documentation from those definitions to support triage and analysis by engineers, analysts, and AI agents.",
+        "Reduced bundle sizes by approximately\u00a010-20%, depending on region, through code splitting, automatic chunk discovery, and selective prefetching in a shared feature-flags SDK.",
         "Led technical delivery of a PayPal buy now, pay later (BNPL)-only checkout flow for Google's Pixel launch. The flow represents an estimated\u00a0$2.16M in annualized TPV.",
-        "Architected and built a TypeScript analytics framework and integrated it into multiple PayPal applications. Added OpenTelemetry adapters, self-service event documentation, and machine-readable schemas that AI agents can access for downstream triage and analysis.",
-        "Implemented region-based code splitting, automatic chunk discovery, and selective prefetching in a shared feature-flags SDK. Reduced bundle sizes by approximately\u00a010-20%, depending on region, by excluding features unavailable in that region.",
-        "Built Web Devtools that multiple organizations within PayPal use. Published agent skills for AI-assisted Next.js integration. Wrote onboarding guides and mentored engineers across frontend and backend delivery.",
+        "Built web devtools that multiple organizations within PayPal use. Authored agent skills to guide AI-assisted integration of multiple internal frameworks. Wrote onboarding guides and mentored engineers across frontend and backend delivery.",
       ],
     },
     {
@@ -33,7 +33,8 @@ export default {
       bullets: [
         "Led technical decisions for a Next.js checkout rewrite across performance, personalization, and reliability. Reduced P95 first-page load time from over\u00a0six\u00a0seconds to about\u00a0three\u00a0seconds through server-side processing and streaming.",
         "Built and maintained checkout web servers and backend-for-frontend (BFF) services. Integrated authentication, protected routes, and session management for all PayPal Checkout experiences.",
-        "Delivered last-used payment method recommendations, including an ad-blocker compatibility fix. The feature reached full rollout in 2025.",
+        "Built a reusable internal React component library to improve interface consistency and help engineers deliver features faster.",
+        "Mentored engineers through code reviews, testing guidance, and release preparation.",
       ],
     },
     {

@@ -100,7 +100,7 @@ importers:
         specifier: ^6.2.3
         version: 6.2.3
 
-  apps/resume:
+  apps/resume-cms:
     dependencies:
       '@googleapis/drive':
         specifier: ^27.0.0

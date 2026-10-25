@@ -1,22 +1,22 @@
-name: Update Resume
+name: Update Resume CMS
 
 on:
   push:
     branches: ["main"]
     paths:
-      - "apps/resume/**"
-      - ".github/workflows/resume.yml"
+      - "apps/resume-cms/**"
+      - ".github/workflows/resume-cms.yml"
   workflow_dispatch:
 
 defaults:
   run:
-    working-directory: apps/resume
+    working-directory: apps/resume-cms
 
 permissions:
   contents: read
 
 concurrency:
-  group: resume-${{ github.ref }}
+  group: resume-cms-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
           node-version: "24"
       - uses: pnpm/action-setup@v4
       - name: Install resume dependencies
-        run: pnpm install --frozen-lockfile --filter @acme/resume...
+        run: pnpm install --frozen-lockfile --filter @acme/resume-cms...
       - name: Typecheck resume scripts
         run: pnpm typecheck
       - name: Test resume scripts
@@ -39,8 +39,8 @@ jobs:
       - name: Upload PDF and page previews
         uses: actions/upload-artifact@v7
         with:
-          name: resume
-          path: apps/resume/generated/
+          name: resume-cms
+          path: apps/resume-cms/generated/
           if-no-files-found: error
 
   publish:
@@ -58,11 +58,11 @@ jobs:
           node-version: "24"
       - uses: pnpm/action-setup@v4
       - name: Install publishing dependencies
-        run: pnpm install --frozen-lockfile --prod --filter @acme/resume
+        run: pnpm install --frozen-lockfile --prod --filter @acme/resume-cms
       - uses: actions/download-artifact@v8
         with:
-          name: resume
-          path: apps/resume/generated/
+          name: resume-cms
+          path: apps/resume-cms/generated/
       - name: Authenticate as the resume service account
         # Authentication runs after dependency installation and artifact download.
         # The SDK requests the Drive scope using the generated credentials file.
