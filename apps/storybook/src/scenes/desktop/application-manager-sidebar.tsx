@@ -26,10 +26,10 @@ function ApplicationManagerSidebar() {
     >
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <div className="font-semibold text-base">Active windows</div>
+          <div className="text-base font-semibold">Active windows</div>
           <button
             type="button"
-            className="text-muted-foreground text-sm hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-sm"
             onClick={() => {
               closeAll();
             }}

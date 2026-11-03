@@ -13,7 +13,7 @@ function Taskbar({ size = "md", className, ...props }: TaskbarProps) {
     <nav
       data-size={size}
       className={cn(
-        "flex items-center gap-3 border border-border/40 bg-background/80 text-foreground backdrop-blur-md dark:bg-background/70",
+        "border-border/40 bg-background/80 text-foreground dark:bg-background/70 flex items-center gap-3 border backdrop-blur-md",
         "data-[size=sm]:h-8 data-[size=sm]:px-3",
         "data-[size=md]:h-10",
         className,
@@ -59,7 +59,7 @@ function TaskbarDivider({ className, ...props }: TaskbarDividerProps) {
   return (
     <span
       aria-hidden
-      className={cn("h-6 w-px bg-border/60", className)}
+      className={cn("bg-border/60 h-6 w-px", className)}
       {...props}
     />
   );
@@ -93,9 +93,9 @@ function TaskbarItem({
       data-taskbar-variant={variant}
       data-active={active}
       className={cn(
-        "flex items-center justify-center gap-2 rounded-xl font-normal text-sm transition",
+        "flex items-center justify-center gap-2 rounded-xl text-sm font-normal transition",
         "hover:bg-muted/60 data-[active=true]:bg-muted/70",
-        "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring/50",
+        "focus-visible:ring-ring/50 focus-visible:ring-2 focus-visible:outline-hidden",
         "data-[taskbar-variant=icon]:h-9 data-[taskbar-variant=icon]:w-9",
         "data-[taskbar-variant=icon]:px-0",
         "data-[taskbar-variant=label]:h-9 data-[taskbar-variant=label]:px-3",

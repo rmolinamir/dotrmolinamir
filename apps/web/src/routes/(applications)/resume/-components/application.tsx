@@ -28,7 +28,7 @@ export const {
       <LauncherIcon className="bg-background/90 backdrop-blur-xs">
         <FileText />
       </LauncherIcon>
-      <LauncherLabel className="border bg-background/90 px-2 py-0.5 shadow-sm backdrop-blur-xs">
+      <LauncherLabel className="bg-background/90 border px-2 py-0.5 shadow-sm backdrop-blur-xs">
         resume.pdf
       </LauncherLabel>
     </LauncherContent>

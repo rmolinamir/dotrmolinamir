@@ -7,7 +7,7 @@ import { cn } from "../lib/utils";
 
 function TabStrip({ className, ...props }: React.ComponentProps<typeof Tabs>) {
   return (
-    <Tabs className={cn("w-full min-w-0 max-w-full", className)} {...props} />
+    <Tabs className={cn("w-full max-w-full min-w-0", className)} {...props} />
   );
 }
 
@@ -20,7 +20,7 @@ function TabStripRail({
     <div
       data-slot="tabstrip-rail"
       className={cn(
-        "tabstrip-rail w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden px-1",
+        "tabstrip-rail w-full max-w-full min-w-0 overflow-x-auto overflow-y-hidden px-1",
         className,
       )}
       {...props}
@@ -39,7 +39,7 @@ function TabStripList({
       variant="line"
       data-slot="tabstrip-list"
       className={cn(
-        "min-w-max gap-1 rounded-md border border-border/40 px-1 py-1",
+        "border-border/40 min-w-max gap-1 rounded-md border px-1 py-1",
         className,
       )}
       tabIndex={-1}
@@ -74,7 +74,7 @@ function TabStripTabTrigger({
       ref={tabRef}
       data-slot="tabstrip-tab-trigger"
       className={cn(
-        "h-7 max-w-48 justify-start rounded-md border px-2 pr-6 text-foreground/70",
+        "text-foreground/70 h-7 max-w-48 justify-start rounded-md border px-2 pr-6",
         "hover:bg-muted/60 hover:text-foreground",
         "data-active:border-border/60! data-active:bg-background/90 data-active:text-foreground",
         className,

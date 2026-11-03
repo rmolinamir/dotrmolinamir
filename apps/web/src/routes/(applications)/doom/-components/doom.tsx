@@ -46,7 +46,7 @@ export function Doom() {
   }, [game, iframeReady, started]);
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden bg-background/80 p-2 text-foreground shadow-lg sm:gap-4 sm:p-5">
+    <div className="bg-background/80 text-foreground relative flex h-full w-full flex-col items-center justify-center gap-3 overflow-hidden p-2 shadow-lg sm:gap-4 sm:p-5">
       <div className="relative flex min-h-0 w-full flex-1 items-center justify-center">
         <div
           className={cn(
@@ -58,9 +58,9 @@ export function Doom() {
               : "h-full w-full p-4",
           )}
         >
-          <div className="pointer-events-none absolute -inset-2 animate-pulse bg-primary/60 opacity-70 blur-lg" />
-          <div className="relative h-full w-full border border-border/60 bg-card/80 p-1 sm:p-3">
-            <div className="relative h-full w-full overflow-hidden bg-background/95">
+          <div className="bg-primary/60 pointer-events-none absolute -inset-2 animate-pulse opacity-70 blur-lg" />
+          <div className="border-border/60 bg-card/80 relative h-full w-full border p-1 sm:p-3">
+            <div className="bg-background/95 relative h-full w-full overflow-hidden">
               {started ? (
                 <div className="h-full w-full">
                   <iframe
@@ -85,7 +85,7 @@ export function Doom() {
                   />
                   <div className="flex flex-col items-center gap-2">
                     <span
-                      className="font-mono text-[11px] text-muted-foreground uppercase tracking-[0.2em]"
+                      className="text-muted-foreground font-mono text-[11px] tracking-[0.2em] uppercase"
                       id="doom-game-label"
                     >
                       Select Game
@@ -97,12 +97,12 @@ export function Doom() {
                       <SelectTrigger
                         aria-label="Select game"
                         aria-labelledby="doom-game-label"
-                        className="w-full max-w-64 border-border/60 bg-muted/40 font-mono text-[11px] text-foreground uppercase tracking-[0.2em] shadow-sm hover:bg-muted/60 data-[state=open]:border-primary/60 data-[state=open]:bg-muted/60"
+                        className="border-border/60 bg-muted/40 text-foreground hover:bg-muted/60 data-[state=open]:border-primary/60 data-[state=open]:bg-muted/60 w-full max-w-64 font-mono text-[11px] tracking-[0.2em] uppercase shadow-sm"
                         id="doom-game-select"
                       >
                         <SelectValue placeholder="Select a game" />
                       </SelectTrigger>
-                      <SelectContent className="border-border/60 bg-card/95 font-mono text-[11px] text-foreground uppercase tracking-[0.2em]">
+                      <SelectContent className="border-border/60 bg-card/95 text-foreground font-mono text-[11px] tracking-[0.2em] uppercase">
                         <SelectItem
                           className="focus:bg-primary/10 focus:text-foreground"
                           value="doom1"
@@ -125,13 +125,13 @@ export function Doom() {
                     </Select>
                   </div>
                   <button
-                    className="border border-primary/70 bg-primary px-6 py-2 font-black font-mono text-[12px] text-primary-foreground uppercase tracking-[0.3em] shadow-sm transition hover:bg-primary/90"
+                    className="border-primary/70 bg-primary text-primary-foreground hover:bg-primary/90 border px-6 py-2 font-mono text-[12px] font-black tracking-[0.3em] uppercase shadow-sm transition"
                     onClick={() => startGame()}
                     type="button"
                   >
                     Start Game
                   </button>
-                  <div className="max-w-105 text-balance font-mono text-[11px] text-muted-foreground uppercase tracking-[0.14em] sm:text-xs">
+                  <div className="text-muted-foreground max-w-105 font-mono text-[11px] tracking-[0.14em] text-balance uppercase sm:text-xs">
                     WebAssembly Doom port with Dwasm. Select a game and get in.
                   </div>
                 </div>
@@ -157,7 +157,7 @@ function DoomFooter({ active, runKey }: DoomFooterProps) {
     <div
       className={cn(
         isMobile ? "hidden" : "flex items-center justify-center",
-        "min-h-12 shrink-0 px-3 pb-1 text-center font-mono text-[10px] text-muted-foreground uppercase tracking-[0.18em] sm:min-h-14 sm:px-4 sm:text-xs",
+        "text-muted-foreground min-h-12 shrink-0 px-3 pb-1 text-center font-mono text-[10px] tracking-[0.18em] uppercase sm:min-h-14 sm:px-4 sm:text-xs",
         active ? "opacity-100" : "pointer-events-none opacity-0",
       )}
     >
@@ -166,7 +166,7 @@ function DoomFooter({ active, runKey }: DoomFooterProps) {
         <DoomInstructions className="text-foreground/0 text-md lg:text-lg" />
         <DoomInstructions
           className={cn(
-            "pointer-events-none absolute inset-0 text-md text-primary lg:text-lg",
+            "text-md text-primary pointer-events-none absolute inset-0 lg:text-lg",
             active && "animate-doom-reveal",
           )}
         />
@@ -180,7 +180,7 @@ type DoomControlsTextProps = Omit<React.ComponentProps<"span">, "children">;
 function DoomInstructions({ className, ...props }: DoomControlsTextProps) {
   return (
     <span
-      className={cn("block whitespace-normal leading-relaxed", className)}
+      className={cn("block leading-relaxed whitespace-normal", className)}
       {...props}
     >
       AIM: MOUSE OR O/P · FIRE: LEFT MOUSE OR SPACE · MOVE: WASD · RUN: SHIFT ·

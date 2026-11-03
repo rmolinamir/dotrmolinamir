@@ -22,7 +22,7 @@ export function Resume() {
           onLoad={() => setIsLoaded(true)}
         />
         {!isLoaded && (
-          <div className="absolute inset-0 touch-none bg-background/90">
+          <div className="bg-background/90 absolute inset-0 touch-none">
             <p role="status" className="sr-only">
               Loading resume viewer…
             </p>

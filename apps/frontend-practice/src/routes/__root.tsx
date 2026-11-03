@@ -26,7 +26,7 @@ function RouteShellComponent({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </head>
-      <body className="relative bg-background">
+      <body className="bg-background relative">
         {children}
         <Scripts />
       </body>

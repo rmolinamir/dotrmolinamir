@@ -48,8 +48,8 @@ function LauncherIcon({ className, ...props }: LauncherIconProps) {
   return (
     <span
       className={cn(
-        "flex items-center justify-center overflow-hidden bg-background text-foreground shadow-sm ring-1 ring-border/40",
-        "select-none transition group-hover:shadow-md",
+        "bg-background text-foreground ring-border/40 flex items-center justify-center overflow-hidden shadow-sm ring-1",
+        "transition select-none group-hover:shadow-md",
         "[&>img]:pointer-events-none [&>img]:select-none [&>svg]:pointer-events-none [&>svg]:select-none",
         "group-data-[size=sm]:h-10 group-data-[size=sm]:w-10",
         "group-data-[size=md]:h-12 group-data-[size=md]:w-12",
@@ -67,7 +67,7 @@ function LauncherLabel({ className, ...props }: LauncherLabelProps) {
   return (
     <span
       className={cn(
-        "max-w-30 text-center font-medium text-foreground leading-tight",
+        "text-foreground max-w-30 text-center leading-tight font-medium",
         "group-data-[size=sm]:text-[11px]",
         "group-data-[size=md]:text-xs",
         "group-data-[size=lg]:text-sm",
@@ -87,7 +87,7 @@ function LauncherDescription({
   return (
     <span
       className={cn(
-        "max-w-30 text-center text-[10px] text-muted-foreground leading-snug",
+        "text-muted-foreground max-w-30 text-center text-[10px] leading-snug",
         className,
       )}
       {...props}

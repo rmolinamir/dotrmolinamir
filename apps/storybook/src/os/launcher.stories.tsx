@@ -41,7 +41,7 @@ export const Default: Story = {
       <WindowBoundary>
         <PurpleWallpaper className="p-10">
           <div className="relative">
-            <div className="text-white/80 text-xs uppercase tracking-[0.25em]">
+            <div className="text-xs tracking-[0.25em] text-white/80 uppercase">
               Launchpad
             </div>
             <div className="mt-6 grid w-full max-w-2xl auto-cols-[120px] grid-flow-col grid-rows-3 gap-4">

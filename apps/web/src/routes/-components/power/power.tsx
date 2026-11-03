@@ -43,7 +43,7 @@ export function PowerButton({
         variant="ghost"
         size="icon"
         className={cn(
-          "relative size-22 p-16 text-chart-5 transition-transform duration-150",
+          "text-chart-5 relative size-22 p-16 transition-transform duration-150",
           "hover:scale-[1.2] active:scale-95",
           className,
         )}

@@ -16,7 +16,7 @@ function FloatingHiddenWindows({ className }: HiddenWindowsTaskbarProps) {
   return (
     <div
       className={cn(
-        "absolute bottom-4 left-4 z-30 rounded-xl border bg-background/90 px-3 py-2 text-xs shadow-lg",
+        "bg-background/90 absolute bottom-4 left-4 z-30 rounded-xl border px-3 py-2 text-xs shadow-lg",
         className,
       )}
     >
@@ -26,7 +26,7 @@ function FloatingHiddenWindows({ className }: HiddenWindowsTaskbarProps) {
           <button
             type="button"
             key={window.id}
-            className="rounded-md border border-border/80 bg-muted/60 px-2 py-1 text-xs"
+            className="border-border/80 bg-muted/60 rounded-md border px-2 py-1 text-xs"
             onClick={() => {
               activateWindow(window.id);
             }}

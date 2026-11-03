@@ -58,7 +58,7 @@ export function TaskbarStart({ className, ...props }: TaskbarLogoProps) {
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <DropdownMenuContent align="start" side="top" className="min-w-48">
-          <DropdownMenuLabel className="select-none text-foreground/55 text-xs">
+          <DropdownMenuLabel className="text-foreground/55 text-xs select-none">
             Start Menu
           </DropdownMenuLabel>
           <DropdownMenuGroup>

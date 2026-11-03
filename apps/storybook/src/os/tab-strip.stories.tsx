@@ -50,7 +50,7 @@ export const Default: Story = {
     }
 
     return (
-      <div className="w-120 max-w-full rounded-xl border border-border/40 bg-background/80 p-4 shadow-sm">
+      <div className="border-border/40 bg-background/80 w-120 max-w-full rounded-xl border p-4 shadow-sm">
         <TabStrip value={activeId} onValueChange={setActiveId}>
           <TabStripRail className="max-w-140">
             <TabStripList>

@@ -102,7 +102,7 @@ function WindowSnap({ children }: WindowSnapProps) {
         <div className="pointer-events-none absolute inset-0 z-20">
           <div
             className={cn([
-              "absolute inset-y-0 w-1/2 border border-border/80 from-muted/60 via-muted/50 to-muted/30 shadow-inner",
+              "border-border/80 from-muted/60 via-muted/50 to-muted/30 absolute inset-y-0 w-1/2 border shadow-inner",
               {
                 "left-0 bg-linear-to-r": snapTarget === "left",
                 "right-0 bg-linear-to-l": snapTarget === "right",

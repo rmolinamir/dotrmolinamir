@@ -46,8 +46,8 @@ function WindowHeader({
       onDoubleClick={handleHeaderDoubleClick}
       className={cn(
         "os-window__rnd-handler",
-        "flex select-none flex-row items-center justify-between gap-3",
-        "border-border/80 border-b bg-accent/90 px-3 py-2! text-accent-foreground backdrop-blur-xs",
+        "flex flex-row items-center justify-between gap-3 select-none",
+        "border-border/80 bg-accent/90 text-accent-foreground border-b px-3 py-2! backdrop-blur-xs",
         "auto-rows-auto grid-rows-none items-center",
         className,
       )}
@@ -65,7 +65,7 @@ function WindowTitle({
     <CardTitle
       ref={ref}
       data-slot="window-title"
-      className={cn("truncate font-medium text-sm", className)}
+      className={cn("truncate text-sm font-medium", className)}
       {...props}
     />
   );
@@ -96,7 +96,7 @@ function WindowContent({
       ref={ref}
       data-slot="window-content"
       className={cn(
-        "flex-1 select-text overflow-auto bg-background/90 px-3 py-2 backdrop-blur-md dark:bg-background/92.5",
+        "bg-background/90 dark:bg-background/92.5 flex-1 overflow-auto px-3 py-2 backdrop-blur-md select-text",
         className,
       )}
       {...props}
@@ -115,7 +115,7 @@ function WindowFooter({
       data-slot="window-footer"
       className={cn(
         "px-3 py-2",
-        "border-border/80 border-t bg-accent/90 text-accent-foreground backdrop-blur-xs",
+        "border-border/80 bg-accent/90 text-accent-foreground border-t backdrop-blur-xs",
         className,
       )}
       {...props}

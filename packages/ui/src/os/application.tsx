@@ -37,7 +37,7 @@ function defineApplication(applicationId: string) {
     registerApplication(application);
 
     return {
-      Component: () => {
+      Component() {
         const { isRunning } = useApplicationManager();
 
         if (!isRunning(application)) {

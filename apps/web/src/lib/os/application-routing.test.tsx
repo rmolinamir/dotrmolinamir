@@ -76,6 +76,7 @@ function setup({
     system: ReturnType<typeof useSystem>;
   };
 
+  // biome-ignore lint/correctness/noComponentHookFactories: This is a file.
   function Desktop() {
     const { isNotFound } = useNotFound();
     const applications = useApplicationManager();
