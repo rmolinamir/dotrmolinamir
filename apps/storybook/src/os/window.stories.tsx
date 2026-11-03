@@ -64,7 +64,7 @@ function WindowControlsHeader() {
 export const Default: Story = {
   render: () => (
     <WindowManagerProvider>
-      <WindowBoundary className="relative h-160 w-full overflow-hidden bg-muted/30 p-6">
+      <WindowBoundary className="bg-muted/30 relative h-160 w-full overflow-hidden p-6">
         <Window>
           <WindowHeader>
             <WindowTitle>About</WindowTitle>
@@ -118,7 +118,7 @@ export const FluidShell: Story = {
   render: () => (
     <WindowManagerProvider>
       <div className="h-180 w-full">
-        <WindowBoundary className="relative h-full w-full overflow-hidden bg-muted/30 p-6">
+        <WindowBoundary className="bg-muted/30 relative h-full w-full overflow-hidden p-6">
           <WindowSnap>
             <Window>
               <WindowHeader>
@@ -143,7 +143,7 @@ export const FluidShell: Story = {
 export const WithDescription: Story = {
   render: () => (
     <WindowManagerProvider>
-      <WindowBoundary className="relative h-160 w-full overflow-hidden bg-muted/30 p-6">
+      <WindowBoundary className="bg-muted/30 relative h-160 w-full overflow-hidden p-6">
         <Window>
           <WindowHeader>
             <div className="space-y-0.5">
@@ -153,10 +153,10 @@ export const WithDescription: Story = {
           </WindowHeader>
           <WindowContent>
             <div className="grid gap-3 text-sm">
-              <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+              <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                 Folder view content goes here.
               </div>
-              <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+              <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                 You can reuse this for file previews or lists.
               </div>
             </div>
@@ -173,7 +173,7 @@ export const WithDescription: Story = {
 export const MultiWindow: Story = {
   render: () => (
     <WindowManagerProvider>
-      <WindowBoundary className="relative h-160 w-full overflow-hidden bg-muted/30 p-6">
+      <WindowBoundary className="bg-muted/30 relative h-160 w-full overflow-hidden p-6">
         <Window
           defaultFraming={{
             position: { x: 8, y: 8 },
@@ -207,10 +207,10 @@ export const MultiWindow: Story = {
           </WindowHeader>
           <WindowContent>
             <div className="grid gap-3 text-sm">
-              <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+              <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                 This window is focused when it sits on top.
               </div>
-              <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+              <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                 Drag each window independently.
               </div>
             </div>
@@ -227,8 +227,8 @@ export const MultiWindow: Story = {
 export const ConstrainedBounds: Story = {
   render: () => (
     <WindowManagerProvider>
-      <WindowBoundary className="relative h-180 w-full overflow-hidden bg-muted/30">
-        <div className="flex h-14 items-center justify-between border-b bg-background/80 px-4 text-muted-foreground text-sm">
+      <WindowBoundary className="bg-muted/30 relative h-180 w-full overflow-hidden">
+        <div className="bg-background/80 text-muted-foreground flex h-14 items-center justify-between border-b px-4 text-sm">
           <span>Top Bar</span>
           <span>Taskbar Area</span>
         </div>
@@ -256,7 +256,7 @@ export const ConstrainedBounds: Story = {
 export const WithSnapping: Story = {
   render: () => (
     <WindowManagerProvider>
-      <WindowBoundary className="relative h-180 w-full overflow-hidden bg-muted/30 p-6">
+      <WindowBoundary className="bg-muted/30 relative h-180 w-full overflow-hidden p-6">
         <WindowSnap>
           <Window
             defaultFraming={{
@@ -288,10 +288,10 @@ export const WithSnapping: Story = {
             </WindowHeader>
             <WindowContent>
               <div className="grid gap-3 text-sm">
-                <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+                <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                   Snap to the right half.
                 </div>
-                <div className="rounded-lg border border-muted-foreground/40 border-dashed px-3 py-4">
+                <div className="border-muted-foreground/40 rounded-lg border border-dashed px-3 py-4">
                   Overlay appears on hover.
                 </div>
               </div>
@@ -327,7 +327,7 @@ export const WithControls: Story = {
   render: () => (
     <TooltipProvider>
       <WindowManagerProvider>
-        <WindowBoundary className="relative h-180 w-full overflow-hidden bg-muted/30 p-6">
+        <WindowBoundary className="bg-muted/30 relative h-180 w-full overflow-hidden p-6">
           <FloatingHiddenWindows />
           <Window
             defaultFraming={{
@@ -385,6 +385,7 @@ export const WithControls: Story = {
 
 export const CenteredFraming: Story = {
   render: () => {
+    // biome-ignore lint/correctness/noComponentHookFactories: This is a file.
     function CenteredWindow(
       props: Omit<React.ComponentProps<typeof Window>, "defaultFraming">,
     ) {
@@ -429,7 +430,7 @@ export const CascadingFraming: Story = {
 
     return (
       <WindowManagerProvider>
-        <WindowBoundary className="relative h-180 w-full overflow-hidden bg-muted/30 p-6">
+        <WindowBoundary className="bg-muted/30 relative h-180 w-full overflow-hidden p-6">
           {windowIds.map((id) => (
             <CascadingWindow key={id} id={id} onOpen={openWindow} />
           ))}

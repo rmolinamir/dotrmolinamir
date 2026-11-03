@@ -140,7 +140,7 @@ export function About() {
       className={cn(
         "h-full text-sm [&_.bn-container]:flex",
         "[&_.bn-container]:flex-col-reverse [&_.bn-container]:pb-60! [&_.tiptap]:bg-transparent!",
-        "[&_.bn-toolbar]:sticky! [&_.bn-toolbar]:top-0 [&_.bn-toolbar]:z-formatting [&_.bn-toolbar]:mb-8 [&_.bn-toolbar]:border-s-0 [&_.bn-toolbar]:border-e-0 [&_.bn-toolbar]:border-t-0 [&_.bn-toolbar]:shadow-none",
+        "[&_.bn-toolbar]:z-formatting [&_.bn-toolbar]:sticky! [&_.bn-toolbar]:top-0 [&_.bn-toolbar]:mb-8 [&_.bn-toolbar]:border-s-0 [&_.bn-toolbar]:border-e-0 [&_.bn-toolbar]:border-t-0 [&_.bn-toolbar]:shadow-none",
         "[&_.bn-toolbar_[data-slot=select-trigger]]:w-50! [&_.bn-toolbar_[data-slot=select-trigger]]:shadow-none",
       )}
     >

@@ -112,7 +112,7 @@ export function BitcoinFormInput({
     <div className={cn("flex items-center justify-start", className)}>
       <input
         data-slot="bitcoin-form-input"
-        className="field-sizing-content h-7 min-w-[1ch] text-lg placeholder-foreground caret-primary outline-0"
+        className="placeholder-foreground caret-primary field-sizing-content h-7 min-w-[1ch] text-lg outline-0"
         type="text"
         inputMode="decimal"
         autoComplete="off"
@@ -126,7 +126,7 @@ export function BitcoinFormInput({
         data-slot="bitcoin-form-input-currency"
         type="button"
         onClick={handleClick}
-        className="h-7 w-full flex-1 cursor-text text-left text-lg text-muted-foreground"
+        className="text-muted-foreground h-7 w-full flex-1 cursor-text text-left text-lg"
         tabIndex={-1}
       >
         {currency}

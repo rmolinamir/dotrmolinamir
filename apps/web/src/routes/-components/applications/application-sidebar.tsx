@@ -58,10 +58,10 @@ function ApplicationSidebar({
     >
       <SidebarHeader>
         <div className="flex items-center justify-between">
-          <div className="font-semibold text-base">Applications</div>
+          <div className="text-base font-semibold">Applications</div>
           <button
             type="button"
-            className="text-muted-foreground text-sm hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground text-sm"
             onClick={() => {
               quitApplications();
               toggleSidebar();

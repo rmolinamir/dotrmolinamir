@@ -98,7 +98,7 @@ export const Default: Story = {
                   <Taskbar className="mx-4 my-2 rounded-full border border-black/10 text-slate-900 shadow-[0_18px_40px_rgba(15,23,42,0.25)]">
                     <TaskbarSection
                       align="start"
-                      className="gap-1 text-slate-700 text-sm"
+                      className="gap-1 text-sm text-slate-700"
                       grow
                     >
                       <TaskbarItem

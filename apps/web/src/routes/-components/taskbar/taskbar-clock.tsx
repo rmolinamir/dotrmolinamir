@@ -83,7 +83,7 @@ export function TaskbarClock({ className, ...props }: ClockProps) {
           </DropdownMenuTrigger>
         </TooltipTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel className="select-none text-foreground/55 text-xs">
+          <DropdownMenuLabel className="text-foreground/55 text-xs select-none">
             Formats
           </DropdownMenuLabel>
           <DropdownMenuItem onClick={() => setFormat("24")}>

@@ -38,7 +38,7 @@ export function RootLayout({
           {isOff && (
             <PowerScreen
               className={cn(
-                "absolute inset-0 top-0 left-0 z-power h-full w-full",
+                "z-power absolute inset-0 top-0 left-0 h-full w-full",
                 "animate-screen-blackout opacity-0",
               )}
             >

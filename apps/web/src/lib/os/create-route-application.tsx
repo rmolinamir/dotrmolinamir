@@ -31,6 +31,10 @@ type RouteApplicationDefinition = ApplicationDefinition & {
   launcher: ApplicationDefinition["component"];
 };
 
+type LoadingApplicationProps = {
+  fallback?: React.ComponentType | undefined;
+};
+
 export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
   const applicationFactory = defineApplication(toPath);
 
@@ -40,19 +44,6 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
     launcher: LauncherComponent,
     ...applicationFactoryDefinition
   }: RouteApplicationDefinition) => {
-    function LoadingApplication() {
-      const { insertLoadingApplication, removeLoadingApplication } =
-        useSystem();
-      const { application } = useApplication();
-
-      React.useEffect(() => {
-        insertLoadingApplication(application);
-        return () => removeLoadingApplication(application);
-      }, [application, insertLoadingApplication, removeLoadingApplication]);
-
-      return FallbackComponent ? <FallbackComponent /> : null;
-    }
-
     const Application = applicationFactory({
       ...applicationFactoryDefinition,
       component: () => {
@@ -104,7 +95,9 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
                 </WindowCloseButton>
               </WindowControls>
             </WindowHeader>
-            <React.Suspense fallback={<LoadingApplication />}>
+            <React.Suspense
+              fallback={<LoadingApplication fallback={FallbackComponent} />}
+            >
               <ApplicationComponent />
             </React.Suspense>
           </Window>
@@ -114,26 +107,36 @@ export function createApplicationRoute(toPath: keyof FileRoutesByTo) {
 
     registerApplicationRoute(toPath);
 
-    function Launcher() {
-      return (
-        <LauncherPrimitive asChild>
-          <Link to={toPath}>
-            <LauncherComponent />
-          </Link>
-        </LauncherPrimitive>
-      );
-    }
-
-    function Route({ children }: React.PropsWithChildren) {
-      const { launchWindow } = Application.useApplication();
-      useApplicationRoute(toPath, launchWindow);
-      return children;
-    }
-
     return {
       Application,
-      Launcher,
-      Route,
+      Launcher() {
+        return (
+          <LauncherPrimitive asChild>
+            <Link to={toPath}>
+              <LauncherComponent />
+            </Link>
+          </LauncherPrimitive>
+        );
+      },
+      Route({ children }: React.PropsWithChildren) {
+        const { launchWindow } = Application.useApplication();
+        useApplicationRoute(toPath, launchWindow);
+        return children;
+      },
     };
   };
+}
+
+function LoadingApplication({
+  fallback: FallbackComponent,
+}: LoadingApplicationProps) {
+  const { insertLoadingApplication, removeLoadingApplication } = useSystem();
+  const { application } = useApplication();
+
+  React.useEffect(() => {
+    insertLoadingApplication(application);
+    return () => removeLoadingApplication(application);
+  }, [application, insertLoadingApplication, removeLoadingApplication]);
+
+  return FallbackComponent ? <FallbackComponent /> : null;
 }

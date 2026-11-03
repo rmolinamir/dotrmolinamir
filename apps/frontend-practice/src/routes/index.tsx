@@ -30,7 +30,7 @@ function App() {
   return (
     <main className="flex min-h-svh items-center justify-center">
       <Card className="container flex max-w-lg flex-col gap-y-4">
-        <CardHeader className="font-bold text-lg">Practice Problems</CardHeader>
+        <CardHeader className="text-lg font-bold">Practice Problems</CardHeader>
         <CardContent>
           <ul>
             {links.map((link) => (

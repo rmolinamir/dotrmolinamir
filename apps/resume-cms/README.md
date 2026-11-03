@@ -172,11 +172,11 @@ In repository **Settings → Environments**, create or open `resume-cms`.
 Restrict deployment branches to `main`. Add these **environment variables**, not
 secrets:
 
-| Variable | Value |
-| --- | --- |
+| Variable                            | Value                                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
 | `GOOGLE_WORKLOAD_IDENTITY_PROVIDER` | The full provider name printed above: `projects/NUMBER/locations/global/workloadIdentityPools/resume-cms/providers/resume-cms` |
-| `GOOGLE_SERVICE_ACCOUNT` | The existing service-account email, for example `dotrmolinamir-resume-cms@dotrmolinamir.iam.gserviceaccount.com` |
-| `GOOGLE_DRIVE_FILE_ID` | Optional. Defaults to `15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9`. Keep this ID to preserve existing links. |
+| `GOOGLE_SERVICE_ACCOUNT`            | The existing service-account email, for example `dotrmolinamir-resume-cms@dotrmolinamir.iam.gserviceaccount.com`               |
+| `GOOGLE_DRIVE_FILE_ID`              | Optional. Defaults to `15bEpE77LztNaNu2fn2wRtPsXeKzHSCu9`. Keep this ID to preserve existing links.                            |
 
 No Google credential secrets are needed. The publish job alone has `id-token:
 write`. It uses `google-github-actions/auth` after dependency installation and

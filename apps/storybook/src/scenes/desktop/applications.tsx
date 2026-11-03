@@ -30,7 +30,7 @@ const MailApplication = defineApplication("mail")({
           Your daily digest is waiting. Tap a message to open it in a new
           window.
         </p>
-        <div className="rounded-lg border border-muted-foreground/30 border-dashed px-3 py-3 text-muted-foreground text-xs">
+        <div className="border-muted-foreground/30 text-muted-foreground rounded-lg border border-dashed px-3 py-3 text-xs">
           12 new messages
         </div>
       </div>
@@ -75,7 +75,7 @@ const NotesApplication = defineApplication("notes")({
         <p className="text-muted-foreground">
           Three drafts synced from mobile.
         </p>
-        <ul className="space-y-1 text-muted-foreground text-xs">
+        <ul className="text-muted-foreground space-y-1 text-xs">
           <li>- Taskbar animations</li>
           <li>- Sidebar routing</li>
           <li>- Menu polish</li>
@@ -122,7 +122,7 @@ const InsightsApplication = defineApplication("insights")({
         <p className="text-muted-foreground">
           Conversion rates are up 8% week over week.
         </p>
-        <div className="rounded-lg bg-muted/40 px-3 py-2 text-muted-foreground text-xs">
+        <div className="bg-muted/40 text-muted-foreground rounded-lg px-3 py-2 text-xs">
           3 active experiments - 1 needs review
         </div>
       </div>

@@ -48,7 +48,7 @@ export function BSODScreen() {
         <div>
           <Frown className="size-12" />
         </div>
-        <div className="space-y-2 text-[#f1f6ff] leading-relaxed [text-shadow:0_1px_0_rgba(0,0,0,0.35)]">
+        <div className="space-y-2 leading-relaxed text-[#f1f6ff] [text-shadow:0_1px_0_rgba(0,0,0,0.35)]">
           <p>Your PC ran into a problem and needs to restart.</p>
           <p>If you call a support person, give them this info:</p>
           <code>
@@ -58,7 +58,7 @@ export function BSODScreen() {
         <Button
           onClick={shutdown}
           variant="ghost"
-          className="w-fit border border-[#f1f6ff]! font-medium text-[#f1f6ff]! text-lg underline underline-offset-4 opacity-90 transition hover:bg-[#f1f6ff]! hover:text-[#0b2ea3]!"
+          className="w-fit border border-[#f1f6ff]! text-lg font-medium text-[#f1f6ff]! underline underline-offset-4 opacity-90 transition hover:bg-[#f1f6ff]! hover:text-[#0b2ea3]!"
         >
           SHUT DOWN
         </Button>

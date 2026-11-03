@@ -413,7 +413,7 @@ function Window({
           data-fullscreen={isFullscreen ? "true" : "false"}
           onFocusCapture={handleFocusCapture}
           className={cn(
-            "shadow- flex h-full w-full flex-col gap-0 rounded-none border-border/80 bg-transparent p-0",
+            "border-border/80 flex h-full w-full flex-col gap-0 rounded-none bg-transparent p-0",
             "transition-shadow data-[focused=true]:shadow-xl",
             "data-[focused=false]:**:data-[slot=window-content]:select-none",
             "data-[focused=true]:**:data-[slot=window-content]:select-text",

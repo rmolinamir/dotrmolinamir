@@ -76,12 +76,12 @@ export const Default: Story = {
                   <NotesApplication.Component />
 
                   {/* Desktop layer. */}
-                  <div className="m-6 select-none font-semibold text-sm text-white tracking-wide">
+                  <div className="m-6 text-sm font-semibold tracking-wide text-white select-none">
                     Win-doughs 11
                   </div>
                   {!isActivated && (
-                    <div className="pointer-events-none absolute top-6 right-6 select-none text-white/70">
-                      <div className="font-medium text-[13px]">
+                    <div className="pointer-events-none absolute top-6 right-6 text-white/70 select-none">
+                      <div className="text-[13px] font-medium">
                         Activate Win-dough
                       </div>
                       <div className="text-[11px] text-white/35">
@@ -100,7 +100,7 @@ export const Default: Story = {
                   <div className="flex flex-1 items-center gap-2">
                     <ApplicationTaskbarItems />
                   </div>
-                  <div className="text-white/70 text-xs">10:24</div>
+                  <div className="text-xs text-white/70">10:24</div>
                 </nav>
               </div>
             </PurpleWallpaper>
@@ -156,9 +156,9 @@ const AboutApplication = defineApplication("about-application")({
         <React.Suspense
           fallback={
             <div className="space-y-2 text-sm">
-              <div className="h-4 w-32 rounded bg-muted/60" />
-              <div className="h-3 w-48 rounded bg-muted/50" />
-              <div className="h-3 w-40 rounded bg-muted/50" />
+              <div className="bg-muted/60 h-4 w-32 rounded" />
+              <div className="bg-muted/50 h-3 w-48 rounded" />
+              <div className="bg-muted/50 h-3 w-40 rounded" />
             </div>
           }
         >
@@ -226,9 +226,9 @@ const NotesApplication = defineApplication("notes-application")({
         <React.Suspense
           fallback={
             <div className="space-y-2 text-sm">
-              <div className="h-4 w-28 rounded bg-muted/60" />
-              <div className="h-3 w-52 rounded bg-muted/50" />
-              <div className="h-3 w-44 rounded bg-muted/50" />
+              <div className="bg-muted/60 h-4 w-28 rounded" />
+              <div className="bg-muted/50 h-3 w-52 rounded" />
+              <div className="bg-muted/50 h-3 w-44 rounded" />
             </div>
           }
         >
@@ -273,24 +273,24 @@ function ApplicationTaskbarItems() {
     return (
       <div
         key={application.id}
-        className="relative flex h-8 items-center gap-1 rounded-xl bg-white/5 px-2 py-1 text-white/90 text-xs"
+        className="relative flex h-8 items-center gap-1 rounded-xl bg-white/5 px-2 py-1 text-xs text-white/90"
       >
         <button
           type="button"
-          className="flex items-center gap-2 rounded-lg bg-white/15 px-2 py-1 font-medium text-white/90 text-xs hover:bg-white/25"
+          className="flex items-center gap-2 rounded-lg bg-white/15 px-2 py-1 text-xs font-medium text-white/90 hover:bg-white/25"
           onClick={() => {
             activateWindow(application.id);
             launch(application);
           }}
         >
-          <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-white/20 font-semibold text-[10px]">
+          <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-white/20 text-[10px] font-semibold">
             {application.metadata.title.slice(0, 1)}
           </span>
           {application.metadata.title}
         </button>
         <button
           type="button"
-          className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/80 font-semibold text-[11px] text-slate-900 shadow-sm ring-1 ring-white/60 hover:bg-white"
+          className="absolute -top-1 -right-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/80 text-[11px] font-semibold text-slate-900 shadow-sm ring-1 ring-white/60 hover:bg-white"
           onClick={() => close(application)}
           aria-label={`Close ${application.metadata.title}`}
         >

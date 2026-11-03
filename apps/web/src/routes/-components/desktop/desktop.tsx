@@ -35,7 +35,7 @@ export function Desktop({ className, children, ...props }: DesktopProps) {
     >
       <DesktopWallpaper className="absolute h-full w-full" />
 
-      <ApplicationProgressBar className="absolute top-0 left-0 z-progress" />
+      <ApplicationProgressBar className="z-progress absolute top-0 left-0" />
 
       <WindowBoundary className="pointer-events-none min-h-0 w-full flex-1 **:pointer-events-auto">
         <WindowSnap>
